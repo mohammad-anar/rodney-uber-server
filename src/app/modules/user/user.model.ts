@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { model, Schema } from 'mongoose';
 import config from '../../../config';
-import { USER_ROLES } from '../../../enums/user';
+import { USER_ROLES, UserStatus } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { IUser, UserModal } from './user.interface';
 
@@ -15,6 +15,7 @@ const userSchema = new Schema<IUser, UserModal>(
     role: {
       type: String,
       enum: Object.values(USER_ROLES),
+      default: USER_ROLES.USER,
       required: true,
     },
     email: {
@@ -22,6 +23,10 @@ const userSchema = new Schema<IUser, UserModal>(
       required: true,
       unique: true,
       lowercase: true,
+    },
+    phone: {
+      type: String,
+      unique: true,
     },
     password: {
       type: String,
@@ -35,10 +40,10 @@ const userSchema = new Schema<IUser, UserModal>(
     },
     status: {
       type: String,
-      enum: ['active', 'delete'],
-      default: 'active',
+      enum: UserStatus,
+      default: UserStatus.ACTIVE,
     },
-    verified: {
+    isVerified: {
       type: Boolean,
       default: false,
     },
@@ -60,7 +65,7 @@ const userSchema = new Schema<IUser, UserModal>(
       select: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false },
 );
 
 //exist user check
@@ -77,13 +82,13 @@ userSchema.statics.isExistUserByEmail = async (email: string) => {
 //is match password
 userSchema.statics.isMatchPassword = async (
   password: string,
-  hashPassword: string
+  hashPassword: string,
 ): Promise<boolean> => {
   return await bcrypt.compare(password, hashPassword);
 };
 
 //check user
-userSchema.pre('save', async function (next: any) {
+userSchema.pre('save', async function () {
   //check user
   const isExist = await User.findOne({ email: this.email });
   if (isExist) {
@@ -93,9 +98,8 @@ userSchema.pre('save', async function (next: any) {
   //password hash
   this.password = await bcrypt.hash(
     this.password,
-    Number(config.bcrypt_salt_rounds)
+    Number(config.bcrypt_salt_rounds),
   );
-  next();
 });
 
 export const User = model<IUser, UserModal>('User', userSchema);

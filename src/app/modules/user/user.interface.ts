@@ -1,16 +1,17 @@
 import { Model } from 'mongoose';
-import { USER_ROLES } from '../../../enums/user';
+import { USER_ROLES, UserStatus } from '../../../enums/user';
+
 
 export type IUser = {
   name: string;
   role: USER_ROLES;
-  contact: string;
   email: string;
+  phone?: string;
   password: string;
-  location: string;
+  address: string;
   image?: string;
-  status: 'active' | 'delete';
-  verified: boolean;
+  status: UserStatus;
+  isVerified: boolean;
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode: number;
