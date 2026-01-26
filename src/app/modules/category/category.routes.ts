@@ -8,12 +8,24 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 
 const router = express.Router();
 
+router.get('/', CategoryController.getAllCategories);
 router.post(
   '/',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   fileUploadHandler(),
   validateRequest(CategoryValidation.createCategoryZodSchema),
   CategoryController.createCategory,
+);
+router.get('/:id', CategoryController.getCategoryById);
+router.patch(
+  '/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  CategoryController.updateCategory,
+);
+router.delete(
+  '/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  CategoryController.deleteCategory,
 );
 
 export const CategoryRouter = router;
