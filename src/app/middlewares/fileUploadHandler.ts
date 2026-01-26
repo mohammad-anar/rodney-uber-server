@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import multer, { FileFilterCallback } from 'multer';
@@ -66,8 +66,8 @@ const fileUploadHandler = () => {
         cb(
           new ApiError(
             StatusCodes.BAD_REQUEST,
-            'Only .jpeg, .png, .jpg file supported'
-          )
+            'Only .jpeg, .png, .jpg file supported',
+          ),
         );
       }
     } else if (file.fieldname === 'media') {
@@ -77,8 +77,8 @@ const fileUploadHandler = () => {
         cb(
           new ApiError(
             StatusCodes.BAD_REQUEST,
-            'Only .mp4, .mp3, file supported'
-          )
+            'Only .mp4, .mp3, file supported',
+          ),
         );
       }
     } else if (file.fieldname === 'doc') {
