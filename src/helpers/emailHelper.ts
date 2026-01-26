@@ -18,10 +18,10 @@ const transporter = nodemailer.createTransport({
   debug: true,
 });
 
-transporter.verify((err, success) => {
-  if (err) console.error('SMTP connection failed:', err);
-  else console.log('SMTP ready to send messages');
-});
+// transporter.verify((err, success) => {
+//   if (err) console.error('SMTP connection failed:', err);
+//   else console.log('SMTP ready to send messages');
+// });
 
 const sendEmail = async (values: ISendEmail) => {
   try {

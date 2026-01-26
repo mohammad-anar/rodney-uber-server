@@ -17,6 +17,7 @@ import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
 import { UserStatus } from '../../../enums/user';
+import { IUser } from '../user/user.interface';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -150,6 +151,35 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   return { data, message };
 };
 
+const resendVerifyEmail = async (email: string): Promise<IUser> => {
+  const existingUser = await User.isExistUserByEmail(email);
+  if (!existingUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found');
+  }
+
+  //send email
+  const otp = generateOTP();
+  const values = {
+    name: existingUser.name,
+    otp: otp,
+    email: existingUser.email!,
+  };
+  const createAccountTemplate = emailTemplate.createAccount(values);
+  emailHelper.sendEmail(createAccountTemplate);
+
+  //save to DB
+  const authentication = {
+    oneTimeCode: otp,
+    expireAt: new Date(Date.now() + 3 * 60000),
+  };
+  await User.findOneAndUpdate(
+    { _id: existingUser._id },
+    { $set: { authentication } },
+  );
+
+  return existingUser;
+};
+
 //forget password
 const resetPasswordToDB = async (
   token: string,
@@ -254,6 +284,7 @@ const changePasswordToDB = async (
 
 export const AuthService = {
   verifyEmailToDB,
+  resendVerifyEmail,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
@@ -15,6 +15,20 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+
+const resendVerifyEmail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    const result = await AuthService.resendVerifyEmail(email);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Email resend successfully',
+      data: result,
+    });
+  },
+);
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body;
@@ -68,6 +82,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 
 export const AuthController = {
   verifyEmail,
+  resendVerifyEmail,
   loginUser,
   forgetPassword,
   resetPassword,

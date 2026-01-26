@@ -6,6 +6,11 @@ const createVerifyEmailZodSchema = z.object({
     oneTimeCode: z.number({ message: 'One time code is required' }),
   }),
 });
+const resendVerifyEmailZodSchema = z.object({
+  body: z.object({
+    email: z.string({ message: 'Email is required' }),
+  }),
+});
 
 const createLoginZodSchema = z.object({
   body: z.object({
@@ -43,6 +48,7 @@ const createChangePasswordZodSchema = z.object({
 
 export const AuthValidation = {
   createVerifyEmailZodSchema,
+  resendVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,
