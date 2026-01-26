@@ -11,12 +11,22 @@ const transporter = nodemailer.createTransport({
     user: config.email.user,
     pass: config.email.pass,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
+  logger: true,
+  debug: true,
+});
+
+transporter.verify((err, success) => {
+  if (err) console.error('SMTP connection failed:', err);
+  else console.log('SMTP ready to send messages');
 });
 
 const sendEmail = async (values: ISendEmail) => {
   try {
     const info = await transporter.sendMail({
-      from: `"Simply Good Food" ${config.email.from}`,
+      from: `"Simply Good Food" <${config.email.from}>`,
       to: values.to,
       subject: values.subject,
       html: values.html,
