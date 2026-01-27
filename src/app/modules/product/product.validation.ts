@@ -11,3 +11,17 @@ export const createProductSchema = z.object({
     image: z.string('Image is required'),
   }),
 });
+export const updateProductSchema = z.object({
+  body: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    category: z.string().optional(),
+    price: z
+      .preprocess(
+        val => (val === undefined ? undefined : Number(val)),
+        z.number().nonnegative('Price must be >= 0'),
+      )
+      .optional(),
+    image: z.string().optional(),
+  }),
+});

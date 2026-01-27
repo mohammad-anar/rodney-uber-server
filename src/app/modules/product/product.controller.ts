@@ -27,11 +27,70 @@ const getAllProducts = catchAsync(
 
     sendResponse(res, {
       success: true,
-      statusCode: 201,
+      statusCode: 200,
       message: 'Products retrieved successfully',
       data: result,
     });
   },
 );
+const getProductById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
 
-export const ProductController = { createProduct, getAllProducts };
+    const result = await ProductService.getProductById(id as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: 'Product retrieved successfully',
+      data: result,
+    });
+  },
+);
+const updateProduct = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body;
+    const { id } = req.params;
+    const image = getSingleFilePath(req.files, 'image') as string;
+
+    const payload = { ...body };
+    if (image) {
+      payload.image = image;
+    }
+
+    console.log(payload);
+    const result = await ProductService.updateProduct(id as string, {
+      ...payload,
+    });
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 201,
+      message: 'Products updated successfully',
+      data: result,
+    });
+  },
+);
+
+const deleteProductById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const result = await ProductService.deleteProduct(id as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: 'Product deleted successfully',
+      data: result,
+    });
+  },
+);
+
+export const ProductController = {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProductById,
+};
