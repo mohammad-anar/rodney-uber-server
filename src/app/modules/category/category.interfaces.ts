@@ -1,6 +1,7 @@
 export interface ICategory {
-  name: string;
-  image: string;
+  name?: string;
+  image?: string;
+  status?: string;
 }
 
 export interface IQueryParams {

@@ -13,6 +13,11 @@ export default {
     jwt_secret: process.env.JWT_SECRET,
     jwt_expire_in: process.env.JWT_EXPIRE_IN,
   },
+  twilio: {
+    sid: process.env.TWILIO_ACCOUNT_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
+    serviceId: process.env.TWILIO_VERIFY_SERVICE_SID,
+  },
   email: {
     from: process.env.EMAIL_FROM,
     user: process.env.EMAIL_USER,
@@ -22,6 +27,7 @@ export default {
   },
   super_admin: {
     email: process.env.SUPER_ADMIN_EMAIL,
+    phone: process.env.SUPER_ADMIN_PHONE,
     password: process.env.SUPER_ADMIN_PASSWORD,
   },
 };

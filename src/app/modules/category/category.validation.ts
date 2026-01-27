@@ -5,7 +5,13 @@ const createCategoryZodSchema = z.object({
     name: z.string({ message: 'Name is required' }),
   }),
 });
+const updateCategoryZodSchema = z.object({
+  body: z.object({
+    name: z.string().optional(),
+  }),
+});
 
 export const CategoryValidation = {
   createCategoryZodSchema,
+  updateCategoryZodSchema,
 };

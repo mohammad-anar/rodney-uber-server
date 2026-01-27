@@ -5,8 +5,8 @@ import { USER_ROLES, UserStatus } from '../../../enums/user';
 export type IUser = {
   name: string;
   role: USER_ROLES;
-  email: string;
-  phone?: string;
+  email?: string;
+  phone: string;
   password: string;
   address: string;
   image?: string;

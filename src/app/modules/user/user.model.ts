@@ -16,16 +16,16 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       enum: Object.values(USER_ROLES),
       default: USER_ROLES.USER,
-      required: true,
     },
     email: {
       type: String,
-      required: true,
+      sparse: true,
       unique: true,
       lowercase: true,
     },
     phone: {
       type: String,
+      required: true,
       unique: true,
     },
     password: {
@@ -90,9 +90,9 @@ userSchema.statics.isMatchPassword = async (
 //check user
 userSchema.pre('save', async function () {
   //check user
-  const isExist = await User.findOne({ email: this.email });
+  const isExist = await User.findOne({ phone: this.phone });
   if (isExist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Phone already exist!');
   }
 
   //password hash

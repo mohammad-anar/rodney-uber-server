@@ -1,6 +1,7 @@
 import { Model, model, Schema } from 'mongoose';
 import { Product } from '../product/product.model';
 import { ICategory } from './category.interfaces';
+import { CATEGORY_STATUS } from '../../../enums/product';
 
 const categorySchema = new Schema<ICategory, any>(
   {
@@ -9,6 +10,11 @@ const categorySchema = new Schema<ICategory, any>(
       required: true,
       unique: true,
       trim: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(CATEGORY_STATUS),
+      default: CATEGORY_STATUS.ACTIVE,
     },
     image: {
       type: String,

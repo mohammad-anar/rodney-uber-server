@@ -6,6 +6,7 @@ import router from './routes';
 import { Morgan } from './shared/morgen';
 import sendResponse from './shared/sendResponse';
 const app = express();
+import cookieParser from 'cookie-parser';
 
 //morgan
 app.use(Morgan.successHandler);
@@ -15,6 +16,7 @@ app.use(Morgan.errorHandler);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 //file retrieve
 app.use(express.static('uploads'));

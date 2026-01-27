@@ -1,4 +1,5 @@
 import mongoose, { model, Schema } from 'mongoose';
+import { PRODUCT_AVAILABILITY } from '../../../enums/product';
 
 const productSchema = new Schema(
   {
@@ -24,6 +25,11 @@ const productSchema = new Schema(
     image: {
       type: String,
       required: true,
+    },
+    availability: {
+      type: String,
+      enum: Object.values(PRODUCT_AVAILABILITY),
+      default: PRODUCT_AVAILABILITY.STOCK,
     },
     createdAt: {
       type: Date,

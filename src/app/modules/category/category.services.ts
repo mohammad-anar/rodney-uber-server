@@ -41,7 +41,10 @@ const getCategoryById = async (id: string) => {
   return category;
 };
 //
-const updateCategory = async (id: string, payload: { name: string }) => {
+const updateCategory = async (
+  id: string,
+  payload: { name?: string; image?: string },
+) => {
   const updatedCategory = await Category.findOneAndUpdate(
     { _id: id },
     payload,

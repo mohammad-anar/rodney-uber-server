@@ -8,38 +8,58 @@ import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
+import { sendOTPViaSMS } from '../../../helpers/twilioHelper';
+
+// const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
+//   //set role
+//   payload.role = USER_ROLES.USER;
+//   const createUser = await User.create(payload);
+//   if (!createUser) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
+//   }
+
+//   //send email
+//   const otp = generateOTP();
+//   const values = {
+//     name: createUser.name,
+//     otp: otp,
+//     email: createUser.email!,
+//   };
+//   const createAccountTemplate = emailTemplate.createAccount(values);
+//   emailHelper.sendEmail(createAccountTemplate);
+
+//   //save to DB
+//   const authentication = {
+//     oneTimeCode: otp,
+//     expireAt: new Date(Date.now() + 3 * 60000),
+//   };
+//   await User.findOneAndUpdate(
+//     { _id: createUser._id },
+//     { $set: { authentication } },
+//   );
+
+//   return createUser;
+// };
+
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
-  //set role
-  payload.role = USER_ROLES.USER;
+
+
+  // create user
   const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
   }
 
-  //send email
-  const otp = generateOTP();
-  const values = {
-    name: createUser.name,
-    otp: otp,
-    email: createUser.email!,
-  };
-  const createAccountTemplate = emailTemplate.createAccount(values);
-  emailHelper.sendEmail(createAccountTemplate);
+  // send SMS OTP
+  if (!createUser.phone) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Phone number is required');
+  }
 
-  //save to DB
-  const authentication = {
-    oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
-  };
-  await User.findOneAndUpdate(
-    { _id: createUser._id },
-    { $set: { authentication } },
-  );
+  // await sendOTPViaSMS(createUser.phone);
 
   return createUser;
 };
-
 
 const getUserProfileFromDB = async (
   user: JwtPayload,

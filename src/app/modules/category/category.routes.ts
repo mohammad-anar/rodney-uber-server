@@ -20,6 +20,8 @@ router.get('/:id', CategoryController.getCategoryById);
 router.patch(
   '/:id',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  fileUploadHandler(),
+  validateRequest(CategoryValidation.updateCategoryZodSchema),
   CategoryController.updateCategory,
 );
 router.delete(

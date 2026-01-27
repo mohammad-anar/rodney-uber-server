@@ -4,9 +4,9 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
 
-const verifyEmail = catchAsync(async (req: Request, res: Response) => {
-  const { ...verifyData } = req.body;
-  const result = await AuthService.verifyEmailToDB(verifyData);
+const verifyPhoneToDB = catchAsync(async (req: Request, res: Response) => {
+  const { phone, otp } = req.body;
+  const result = await AuthService.verifyPhoneToDB({ phone, oneTimeCode: otp });
 
   sendResponse(res, {
     success: true,
@@ -16,10 +16,10 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const resendVerifyEmail = catchAsync(
+const resendVerifyPhone = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email } = req.body;
-    const result = await AuthService.resendVerifyEmail(email);
+    const { phone } = req.body;
+    const result = await AuthService.resendVerifyPhone(phone);
 
     sendResponse(res, {
       success: true,
@@ -31,14 +31,21 @@ const resendVerifyEmail = catchAsync(
 );
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const { ...loginData } = req.body;
-  const result = await AuthService.loginUserFromDB(loginData);
+  const { phone, password } = req.body;
+  const result = await AuthService.loginUserFromDB({ phone, password });
+
+  res.cookie('refreshToken', result.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
+    maxAge: 1000 * 60 * 60 * 24 * 30,
+  });
 
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'User logged in successfully.',
-    data: result.createToken,
+    data: { accessToken: result.accessToken },
   });
 });
 
@@ -81,8 +88,10 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const AuthController = {
-  verifyEmail,
-  resendVerifyEmail,
+  // verifyEmail,
+  // resendVerifyEmail,
+  resendVerifyPhone,
+  verifyPhoneToDB,
   loginUser,
   forgetPassword,
   resetPassword,

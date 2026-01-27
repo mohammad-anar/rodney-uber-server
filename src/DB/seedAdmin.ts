@@ -5,10 +5,11 @@ import { logger } from '../shared/logger';
 
 const payload = {
   name: 'Super Admin',
+  phone: config.super_admin.phone,
   email: config.super_admin.email,
   role: USER_ROLES.SUPER_ADMIN,
   password: config.super_admin.password,
-  verified: true,
+  isVerified: true,
 };
 
 export const seedSuperAdmin = async () => {

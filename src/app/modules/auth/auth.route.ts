@@ -19,14 +19,14 @@ router.post(
 );
 
 router.post(
-  '/verify-email',
+  '/verify-otp',
   validateRequest(AuthValidation.createVerifyEmailZodSchema),
-  AuthController.verifyEmail,
+  AuthController.verifyPhoneToDB,
 );
 router.post(
-  '/resend-verify-email',
+  '/resend-otp',
   validateRequest(AuthValidation.resendVerifyEmailZodSchema),
-  AuthController.resendVerifyEmail,
+  AuthController.resendVerifyPhone,
 );
 
 router.post(

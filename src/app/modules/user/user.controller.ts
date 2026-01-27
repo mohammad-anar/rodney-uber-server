@@ -4,11 +4,19 @@ import catchAsync from '../../../shared/catchAsync';
 import { getSingleFilePath } from '../../../shared/getFilePath';
 import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
+import { USER_ROLES } from '../../../enums/user';
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { ...userData } = req.body;
-    const result = await UserService.createUserToDB(userData);
+    const { name, phone, password } = req.body;
+    const role = USER_ROLES.USER;
+    const result = await UserService.createUserToDB({
+      name,
+      phone,
+      password,
+      role,
+      isVerified: true,
+    });
 
     sendResponse(res, {
       success: true,
@@ -18,7 +26,6 @@ const createUser = catchAsync(
     });
   },
 );
-
 
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;

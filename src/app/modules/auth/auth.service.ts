@@ -18,11 +18,12 @@ import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
 import { UserStatus } from '../../../enums/user';
 import { IUser } from '../user/user.interface';
+import { sendOTPViaSMS, verifyOTPViaSMS } from '../../../helpers/twilioHelper';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
-  const { email, password } = payload;
-  const isExistUser = await User.findOne({ email }).select('+password');
+  const { phone, password } = payload;
+  const isExistUser = await User.findOne({ phone }).select('+password');
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -52,13 +53,18 @@ const loginUserFromDB = async (payload: ILoginData) => {
   }
 
   //create token
-  const createToken = jwtHelper.createToken(
+  const accessToken = jwtHelper.createToken(
     { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
     config.jwt.jwt_secret as Secret,
     config.jwt.jwt_expire_in as SignOptions['expiresIn'],
   );
+  const refreshToken = jwtHelper.createToken(
+    { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+    config.jwt.jwt_secret as Secret,
+    '30d',
+  );
 
-  return { createToken };
+  return { accessToken, refreshToken };
 };
 
 //forget password
@@ -86,9 +92,79 @@ const forgetPasswordToDB = async (email: string) => {
 };
 
 //verify email
-const verifyEmailToDB = async (payload: IVerifyEmail) => {
-  const { email, oneTimeCode } = payload;
-  const isExistUser = await User.findOne({ email }).select('+authentication');
+// const verifyEmailToDB = async (payload: IVerifyEmail) => {
+//   const { email, oneTimeCode } = payload;
+//   const isExistUser = await User.findOne({ email }).select('+authentication');
+//   if (!isExistUser) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+//   }
+
+//   if (!oneTimeCode) {
+//     throw new ApiError(
+//       StatusCodes.BAD_REQUEST,
+//       'Please give the otp, check your email we send a code',
+//     );
+//   }
+
+//   if (isExistUser.authentication?.oneTimeCode !== oneTimeCode) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'You provided wrong otp');
+//   }
+
+//   const date = new Date();
+//   if (date > isExistUser.authentication?.expireAt) {
+//     throw new ApiError(
+//       StatusCodes.BAD_REQUEST,
+//       'Otp already expired, Please try again',
+//     );
+//   }
+
+//   let message;
+//   let data;
+
+//   if (!isExistUser.isVerified) {
+//     await User.findOneAndUpdate(
+//       { _id: isExistUser._id },
+//       {
+//         isVerified: true,
+//         authentication: { oneTimeCode: null, expireAt: null },
+//       },
+//     );
+//     message = 'Email verify successfully';
+//   } else {
+//     await User.findOneAndUpdate(
+//       { _id: isExistUser._id },
+//       {
+//         authentication: {
+//           isResetPassword: true,
+//           oneTimeCode: null,
+//           expireAt: null,
+//         },
+//       },
+//     );
+
+//     //create token ;
+//     const createToken = cryptoToken();
+//     const dateTime = String(new Date(Date.now() + 5 * 60000));
+//     await ResetToken.create({
+//       user: isExistUser._id,
+//       token: createToken,
+//       expireAt: dateTime,
+//     });
+//     message =
+//       'Verification Successful: Please securely store and utilize this code for reset password';
+//     data = createToken;
+//   }
+//   return { data, message };
+// };
+// verify phone
+const verifyPhoneToDB = async (payload: {
+  phone: string;
+  oneTimeCode: string;
+}) => {
+  const { phone, oneTimeCode } = payload;
+
+  // find user by phone
+  const isExistUser = await User.findOne({ phone });
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -96,47 +172,25 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   if (!oneTimeCode) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Please give the otp, check your email we send a code',
+      'Please provide the OTP sent to your phone',
     );
   }
 
-  if (isExistUser.authentication?.oneTimeCode !== oneTimeCode) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'You provided wrong otp');
-  }
-
-  const date = new Date();
-  if (date > isExistUser.authentication?.expireAt) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'Otp already expired, Please try again',
-    );
+  // verify OTP with Twilio
+  const isVerified = await verifyOTPViaSMS(phone, oneTimeCode);
+  if (!isVerified) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'You provided wrong OTP');
   }
 
   let message;
   let data;
 
   if (!isExistUser.isVerified) {
-    await User.findOneAndUpdate(
-      { _id: isExistUser._id },
-      {
-        isVerified: true,
-        authentication: { oneTimeCode: null, expireAt: null },
-      },
-    );
-    message = 'Email verify successfully';
+    // mark user as verified
+    await User.findOneAndUpdate({ _id: isExistUser._id }, { isVerified: true });
+    message = 'Phone verified successfully';
   } else {
-    await User.findOneAndUpdate(
-      { _id: isExistUser._id },
-      {
-        authentication: {
-          isResetPassword: true,
-          oneTimeCode: null,
-          expireAt: null,
-        },
-      },
-    );
-
-    //create token ;
+    // for password reset scenario, generate reset token
     const createToken = cryptoToken();
     const dateTime = String(new Date(Date.now() + 5 * 60000));
     await ResetToken.create({
@@ -148,34 +202,48 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       'Verification Successful: Please securely store and utilize this code for reset password';
     data = createToken;
   }
-  return { data, message };
+
+  return { message, data };
 };
 
-const resendVerifyEmail = async (email: string): Promise<IUser> => {
-  const existingUser = await User.isExistUserByEmail(email);
+// const resendVerifyEmail = async (email: string): Promise<IUser> => {
+//   const existingUser = await User.isExistUserByEmail(email);
+//   if (!existingUser) {
+//     throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found');
+//   }
+
+//   //send email
+//   const otp = generateOTP();
+//   const values = {
+//     name: existingUser.name,
+//     otp: otp,
+//     email: existingUser.email!,
+//   };
+//   const createAccountTemplate = emailTemplate.createAccount(values);
+//   emailHelper.sendEmail(createAccountTemplate);
+
+//   //save to DB
+//   const authentication = {
+//     oneTimeCode: otp,
+//     expireAt: new Date(Date.now() + 3 * 60000),
+//   };
+//   await User.findOneAndUpdate(
+//     { _id: existingUser._id },
+//     { $set: { authentication } },
+//   );
+
+//   return existingUser;
+// };
+
+const resendVerifyPhone = async (phone: string): Promise<IUser> => {
+  // check if user exists
+  const existingUser = await User.findOne({ phone });
   if (!existingUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found');
   }
 
-  //send email
-  const otp = generateOTP();
-  const values = {
-    name: existingUser.name,
-    otp: otp,
-    email: existingUser.email!,
-  };
-  const createAccountTemplate = emailTemplate.createAccount(values);
-  emailHelper.sendEmail(createAccountTemplate);
-
-  //save to DB
-  const authentication = {
-    oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
-  };
-  await User.findOneAndUpdate(
-    { _id: existingUser._id },
-    { $set: { authentication } },
-  );
+  // send OTP via Twilio
+  await sendOTPViaSMS(phone);
 
   return existingUser;
 };
@@ -283,8 +351,10 @@ const changePasswordToDB = async (
 };
 
 export const AuthService = {
-  verifyEmailToDB,
-  resendVerifyEmail,
+  // verifyEmailToDB,
+  // resendVerifyEmail,
+  verifyPhoneToDB,
+  resendVerifyPhone,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,
