@@ -8,7 +8,6 @@ export const createProductSchema = z.object({
     price: z
       .number({ message: 'Price must be a number' })
       .nonnegative('Price must be >= 0'),
-    image: z.string('Image is required'),
   }),
 });
 export const updateProductSchema = z.object({
@@ -22,6 +21,5 @@ export const updateProductSchema = z.object({
         z.number().nonnegative('Price must be >= 0'),
       )
       .optional(),
-    image: z.string().optional(),
   }),
 });
