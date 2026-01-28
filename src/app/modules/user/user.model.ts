@@ -43,6 +43,9 @@ const userSchema = new Schema<IUser, UserModal>(
       enum: UserStatus,
       default: UserStatus.ACTIVE,
     },
+    address: {
+      type: String,
+    },
     isVerified: {
       type: Boolean,
       default: false,
@@ -53,14 +56,14 @@ const userSchema = new Schema<IUser, UserModal>(
           type: Boolean,
           default: false,
         },
-        oneTimeCode: {
-          type: Number,
-          default: null,
-        },
-        expireAt: {
-          type: Date,
-          default: null,
-        },
+        // oneTimeCode: {
+        //   type: Number,
+        //   default: null,
+        // },
+        // expireAt: {
+        //   type: Date,
+        //   default: null,
+        // },
       },
       select: 0,
     },

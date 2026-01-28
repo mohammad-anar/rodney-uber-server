@@ -5,6 +5,9 @@ import { getSingleFilePath } from '../../../shared/getFilePath';
 import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
 import { USER_ROLES } from '../../../enums/user';
+import config from '../../../config';
+import { IUser } from './user.interface';
+import ApiError from '../../../errors/ApiError';
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -40,25 +43,43 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 //update profile
-const updateProfile = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user;
-    let image = getSingleFilePath(req.files, 'image');
+const updateProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const data = req.body;
+  const image = getSingleFilePath(req.files, 'image');
 
-    const data = {
-      image,
-      ...req.body,
-    };
-    const result = await UserService.updateProfileToDB(user, data);
+  const payload: Partial<IUser> = {};
 
-    sendResponse(res, {
-      success: true,
-      statusCode: StatusCodes.OK,
-      message: 'Profile updated successfully',
-      data: result,
-    });
-  },
-);
+  const allowedFields: (keyof IUser)[] = ['name', 'email', 'address', 'status'];
+
+  allowedFields.forEach(field => {
+    if (data?.[field] !== undefined) {
+      payload[field] = data[field];
+    }
+  });
+
+  if (image) {
+    payload.image = `http://${config.ip_address}:${config.port}${image}`;
+  }
+
+  // 🔒 prevent empty updates
+  if (Object.keys(payload).length === 0) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'No valid fields provided for update',
+    );
+  }
+
+  const result = await UserService.updateProfileToDB(user, payload);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Profile updated successfully',
+    data: result,
+  });
+});
+
 
 export const UserController = {
   createUser,

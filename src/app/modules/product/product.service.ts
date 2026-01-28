@@ -28,10 +28,10 @@ const getAllProducts = async (query: IQueryParams) => {
 
   qb.search(['title', 'description']).filter().sort().paginate().fields();
 
-  const categories = await qb.modelQuery;
+  const products = await qb.modelQuery;
   const paginationInfo = await qb.getPaginationInfo();
 
-  return { meta: paginationInfo, data: categories };
+  return { meta: paginationInfo, data: products };
 };
 //
 const getProductById = async (id: string) => {

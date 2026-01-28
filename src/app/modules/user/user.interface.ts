@@ -1,14 +1,13 @@
 import { Model } from 'mongoose';
 import { USER_ROLES, UserStatus } from '../../../enums/user';
 
-
 export type IUser = {
   name: string;
   role: USER_ROLES;
   email?: string;
   phone: string;
   password: string;
-  address: string;
+  address?: string;
   image?: string;
   status: UserStatus;
   isVerified: boolean;
