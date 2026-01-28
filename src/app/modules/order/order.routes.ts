@@ -21,17 +21,17 @@ router.post(
 router.get(
   '/:id',
   auth(USER_ROLES.USER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-  OrderController.createOrder,
+  OrderController.getOrderById,
 );
 router.patch(
   '/:id',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-  OrderController.createOrder,
+  OrderController.updateOrder,
 );
 router.delete(
   '/:id',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
-  OrderController.createOrder,
+  OrderController.deleteOrder,
 );
 
 export const OrderRouter = router;

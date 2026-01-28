@@ -42,11 +42,16 @@ const getOrderById = async (id: string) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ApiError(400, 'Invalid order ID');
   }
-  const order = await Order.findById(id);
+  const order = await Order.findById(id).populate('productId');
   if (!order) {
     throw new ApiError(404, 'Order not found');
   }
-  return order;
+
+  const obj = order.toObject() as any;
+  obj.product = obj.productId;
+  delete obj.productId;
+
+  return obj;
 };
 // update order
 const updateOrder = async (id: string, payload: Partial<IOrder>) => {
