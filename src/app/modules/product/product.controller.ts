@@ -3,13 +3,18 @@ import catchAsync from '../../../shared/catchAsync';
 import { ProductService } from './product.service';
 import sendResponse from '../../../shared/sendResponse';
 import { getSingleFilePath } from '../../../shared/getFilePath';
+import config from '../../../config';
 
 const createProduct = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
     const image = getSingleFilePath(req.files, 'image') as string;
+    const imageUrl = `http://${config.ip_address}:${config.port}`.concat(image);
 
-    const result = await ProductService.createProduct({ ...payload, image });
+    const result = await ProductService.createProduct({
+      ...payload,
+      image: imageUrl,
+    });
 
     sendResponse(res, {
       success: true,
@@ -52,10 +57,11 @@ const updateProduct = catchAsync(
     const body = req.body;
     const { id } = req.params;
     const image = getSingleFilePath(req.files, 'image') as string;
+    const imageUrl = `http://${config.ip_address}:${config.port}`.concat(image);
 
     const payload = { ...body };
     if (image) {
-      payload.image = image;
+      payload.image = imageUrl;
     }
 
     console.log(payload);

@@ -3,12 +3,17 @@ import catchAsync from '../../../shared/catchAsync';
 import { getSingleFilePath } from '../../../shared/getFilePath';
 import { CategoryService } from './category.services';
 import sendResponse from '../../../shared/sendResponse';
+import config from '../../../config';
 
 const createCategory = catchAsync(async (req: Request, res: Response) => {
   const { name } = req.body;
   const image = getSingleFilePath(req.files, 'image') as string;
+  const imageUrl = `http://${config.ip_address}:${config.port}`.concat(image);
 
-  const result = await CategoryService.createCategory({ name, image });
+  const result = await CategoryService.createCategory({
+    name,
+    image: imageUrl,
+  });
 
   sendResponse(res, {
     success: true,
@@ -44,12 +49,13 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name } = req.body;
   const image = getSingleFilePath(req.files, 'image') as string;
+  const imageUrl = `http://${config.ip_address}:${config.port}`.concat(image);
   const payload: { name?: string; image?: string } = {};
   if (name) {
     payload.name = name;
   }
   if (image) {
-    payload.image = image;
+    payload.image = imageUrl;
   }
   const result = await CategoryService.updateCategory(id as string, payload);
 
