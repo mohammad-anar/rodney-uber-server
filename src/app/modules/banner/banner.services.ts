@@ -29,7 +29,7 @@ const getBannerById = async (id: string) => {
 };
 
 const updateBanner = async (id: string, payload: Partial<IBanner>) => {
-  console.log(id, payload);
+
   const result = await Banner.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,

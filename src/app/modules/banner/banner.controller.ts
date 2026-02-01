@@ -51,7 +51,6 @@ const updateBanner = catchAsync(async (req: Request, res: Response) => {
   };
   const { id } = req.params;
   const data = req.body;
-  console.log(data);
   const image = getSingleFilePath(req.files, 'image') as string;
   const imageUrl = `http://${config.ip_address}:${config.port}`.concat(image);
   const payload: { name?: string; image?: string } = {};
@@ -64,7 +63,6 @@ const updateBanner = catchAsync(async (req: Request, res: Response) => {
     payload.image = imageUrl;
   }
 
-  console.log(payload);
   const result = await BannerServices.updateBanner(id as string, payload);
 
   sendResponse(res, {
