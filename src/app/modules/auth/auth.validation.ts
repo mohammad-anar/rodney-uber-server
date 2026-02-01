@@ -14,7 +14,7 @@ const resendVerifyEmailZodSchema = z.object({
 
 const createLoginZodSchema = z.object({
   body: z.object({
-    phone: z.string({ message: 'Email is required' }),
+    phone: z.string({ message: 'Phone is required' }),
     password: z.string({ message: 'Password is required' }),
   }),
 });

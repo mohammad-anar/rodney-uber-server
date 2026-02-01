@@ -117,6 +117,10 @@ const getAnalytics = async () => {
         : 0;
 
   return {
+    totalUsers: totalUsersAllTime,
+    totalOrders: totalOrdersAllTime,
+    totalProducts: totalProductsAllTime,
+    pendingOrdersChangePercentage: pendingOrdersChangePercentage.toFixed(2),
     totalUsersCurrentMonth,
     totalOrdersCurrentMonth,
     totalProductsCurrentMonth,
@@ -126,10 +130,6 @@ const getAnalytics = async () => {
     productChangePercentage: productChangePercentage.toFixed(2),
     orderChangePercentage: orderChangePercentage.toFixed(2),
     userChangePercentage: userChangePercentage.toFixed(2),
-    totalUsers: totalUsersAllTime,
-    totalOrders: totalOrdersAllTime,
-    totalProducts: totalProductsAllTime,
-    pendingOrdersChangePercentage: pendingOrdersChangePercentage.toFixed(2),
     totalPendingOrdersToday: pendingOrdersToday,
     totalPendingOrdersYesterday: pendingOrdersYesterday,
   };
