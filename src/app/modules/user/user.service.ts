@@ -9,6 +9,8 @@ import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import { sendOTPViaSMS } from '../../../helpers/twilioHelper';
+import { IQueryParams } from '../category/category.interfaces';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 //   //set role
@@ -41,10 +43,26 @@ import { sendOTPViaSMS } from '../../../helpers/twilioHelper';
 //   return createUser;
 // };
 
+const getAllUsers = async (query: IQueryParams) => {
+  const modelQuery = User.find();
+
+  const qb = new QueryBuilder(modelQuery, query);
+
+  qb.search(['name', 'email']).filter().sort().paginate().fields();
+
+  const orders = await qb.modelQuery;
+
+  const paginationInfo = await qb.getPaginationInfo();
+
+  return { meta: paginationInfo, data: orders };
+};
+const getUserById = async (id: string) => {
+  const result = await User.findByIdAndDelete(id);
+
+  return result;
+};
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
-
-
   // create user
   const createUser = await User.create(payload);
   if (!createUser) {
@@ -96,6 +114,8 @@ const updateProfileToDB = async (
 };
 
 export const UserService = {
+  getAllUsers,
+  getUserById,
   createUserToDB,
   getUserProfileFromDB,
   updateProfileToDB,
