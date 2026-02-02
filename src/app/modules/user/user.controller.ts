@@ -30,6 +30,28 @@ const createUser = catchAsync(
   },
 );
 
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await UserService.getAllUsers(query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Profile data retrieved successfully',
+    data: result,
+  });
+});
+const getUserById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserService.getUserById(id as string);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Profile data retrieved successfully',
+    data: result,
+  });
+});
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
   const result = await UserService.getUserProfileFromDB(user);
@@ -80,8 +102,9 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 export const UserController = {
+  getAllUsers,
+  getUserById,
   createUser,
   getUserProfile,
   updateProfile,

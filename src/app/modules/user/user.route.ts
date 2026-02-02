@@ -22,9 +22,21 @@ router
 
 router
   .route('/')
+  .get(
+    auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+    UserController.getAllUsers,
+  )
   .post(
     validateRequest(UserValidation.createUserZodSchema),
     UserController.createUser,
   );
+
+router
+  .route('/:id')
+
+  .get(
+    auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+    UserController.getUserById,
+  )
 
 export const UserRoutes = router;
