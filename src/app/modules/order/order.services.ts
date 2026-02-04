@@ -5,10 +5,24 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { IQueryParams } from '../category/category.interfaces';
 import { IOrder } from './order.interfaces';
 import { Order } from './order.model';
+import { Notification } from '../notifications/notification.model';
 
 const createOrder = async (payload: IOrder) => {
   const orderId = await generateOrderId();
   const order = await Order.create({ ...payload, orderId });
+
+  const notification = await Notification.create({
+    user: order?.user?.phone,
+    title: 'New Order',
+    type: 'ORDER',
+    message: `New order #${order.orderId} placed`,
+    data: {
+      orderId: order._id,
+    },
+  });
+  if ((global as any).io) {
+    (global as any).io.emit('new-order', notification);
+  }
 
   return order;
 };
