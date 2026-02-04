@@ -18,7 +18,7 @@ const getAllOrders = async (query: IQueryParams) => {
 
   const qb = new QueryBuilder(modelQuery, query);
 
-  qb.search(['orderId', 'user.phone']).filter().sort().paginate().fields();
+  qb.search(['orderId', 'user phone']).filter().sort().paginate().fields();
 
   const orders = await qb.modelQuery.populate('user', 'name phone').populate({
     path: 'productId',
@@ -34,6 +34,33 @@ const getAllOrders = async (query: IQueryParams) => {
     delete obj.productId;
     return obj;
   });
+
+  return { meta: paginationInfo, data: ordersMapped };
+};
+// get my orders
+const getMyAllOrders = async (query: IQueryParams, phone: string) => {
+  const {
+    page = 1,
+    limit = 10,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = query;
+
+  const total = await Order.countDocuments({ 'user.phone': phone });
+  const orders = await Order.find({ 'user.phone': phone })
+    .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate('productId');
+
+  const ordersMapped = orders.map(order => {
+    const { productId, ...rest } = order.toObject();
+
+    return { ...rest, product: productId };
+  });
+
+  const totalPages = Math.ceil(total / limit);
+  const paginationInfo = { total, page, limit, totalPages };
 
   return { meta: paginationInfo, data: ordersMapped };
 };
@@ -86,6 +113,7 @@ const deleteOrder = async (id: string) => {
 export const OrderService = {
   createOrder,
   getAllOrders,
+  getMyAllOrders,
   getOrderById,
   updateOrder,
   deleteOrder,

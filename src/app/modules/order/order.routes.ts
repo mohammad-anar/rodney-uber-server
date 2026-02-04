@@ -12,6 +12,7 @@ router.get(
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   OrderController.getAllOrders,
 );
+router.get('/me', auth(USER_ROLES.USER), OrderController.getMyAllOrders);
 router.post(
   '/',
   auth(USER_ROLES.USER),
