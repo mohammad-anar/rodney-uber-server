@@ -1,9 +1,0 @@
-export enum PRODUCT_AVAILABILITY {
-  STOCK = 'STOCK',
-  OUT_OF_STOCK = 'OUT_OF_STOCK',
-}
-
-export enum CATEGORY_STATUS {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-}
