@@ -5,19 +5,15 @@ import { ISendEmail } from '../types/email';
 
 const transporter = nodemailer.createTransport({
   host: config.email.host,
-  port: Number(config.email.port),
+  port: Number(config.email.port), // 587
   secure: false,
   auth: {
     user: config.email.user,
     pass: config.email.pass,
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
   logger: true,
   debug: true,
 });
-
 // transporter.verify((err, success) => {
 //   if (err) console.error('SMTP connection failed:', err);
 //   else console.log('SMTP ready to send messages');

@@ -11,7 +11,6 @@ const router = express.Router();
 router.get('/', auth(USER_ROLES.ADMIN), UserController.getAllUsers);
 router.post(
   '/',
-  auth(USER_ROLES.ADMIN),
   fileUploadHandler(),
   validateRequest(UserValidation.createUserZodSchema),
   UserController.createUser,

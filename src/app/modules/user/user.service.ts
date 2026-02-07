@@ -1,4 +1,7 @@
+import { emailHelper } from '../../../helpers/emailHelper';
+import { emailTemplate } from '../../../shared/emailTemplate';
 import { IQueryParams } from '../../../types/pagination';
+import generateOTP from '../../../util/generateOTP';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { IUser } from './user.interface';
 import { User } from './user.model';
@@ -6,11 +9,31 @@ import { User } from './user.model';
 // create users
 const createUser = async (payload: IUser) => {
   const result = await User.create(payload);
+
+  //send email
+  const otp = generateOTP();
+  const values = {
+    name: result.name,
+    otp: otp,
+    email: result.email!,
+  };
+  console.log({ values });
+  const createAccountTemplate = await emailTemplate.createAccount(values);
+  await emailHelper.sendEmail(createAccountTemplate);
+
+  //save to DB
+  const authentication = {
+    oneTimeCode: otp,
+    expireAt: new Date(Date.now() + 3 * 60000),
+  };
+  await User.findOneAndUpdate(
+    { _id: result._id },
+    { $set: { authentication } },
+  );
   return result;
 };
 // get all users
 const getAllUsers = async (query: IQueryParams) => {
-
   const modelQuery = User.find().select('-password');
 
   const qb = new QueryBuilder(modelQuery, query);

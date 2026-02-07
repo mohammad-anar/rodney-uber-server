@@ -3,7 +3,7 @@ import { z } from 'zod';
 const createVerifyEmailZodSchema = z.object({
   body: z.object({
     email: z.string({ message: 'Email is required' }),
-    oneTimeCode: z.number({ message: 'One time code is required' }),
+    otp: z.number({ message: 'One time code is required' }),
   }),
 });
 const resendVerifyEmailZodSchema = z.object({
@@ -14,7 +14,7 @@ const resendVerifyEmailZodSchema = z.object({
 
 const createLoginZodSchema = z.object({
   body: z.object({
-    phone: z.string({ message: 'Phone is required' }),
+    email: z.string({ message: 'Email is required' }),
     password: z.string({ message: 'Password is required' }),
   }),
 });

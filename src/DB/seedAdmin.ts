@@ -9,7 +9,7 @@ const payload = {
   email: config.super_admin.email,
   role: USER_ROLES.ADMIN,
   password: config.super_admin.password,
-  isVerified: true,
+  emailVerified: true,
 };
 
 export const seedSuperAdmin = async () => {

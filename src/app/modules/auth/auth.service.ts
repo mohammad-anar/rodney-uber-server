@@ -6,7 +6,6 @@ import { UserStatus } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { jwtHelper } from '../../../helpers/jwtHelper';
-import { sendOTPViaSMS, verifyOTPViaSMS } from '../../../helpers/twilioHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import {
   IAuthResetPassword,
@@ -136,7 +135,7 @@ const verifyEmail = async (payload: IVerifyEmail) => {
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
-        isVerified: true,
+        emailVerified: true,
         authentication: { oneTimeCode: null, expireAt: null },
       },
     );
@@ -182,7 +181,7 @@ const resendVerifyEmail = async (email: string): Promise<IUser> => {
     email: existingUser.email!,
   };
   const createAccountTemplate = emailTemplate.createAccount(values);
-  emailHelper.sendEmail(createAccountTemplate);
+  await emailHelper.sendEmail(createAccountTemplate);
 
   //save to DB
   const authentication = {
