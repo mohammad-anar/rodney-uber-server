@@ -4,9 +4,9 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
 
-const verifyPhoneToDB = catchAsync(async (req: Request, res: Response) => {
-  const { phone, otp } = req.body;
-  const result = await AuthService.verifyPhoneToDB({ phone, oneTimeCode: otp });
+const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const result = await AuthService.verifyEmail({ email, oneTimeCode: otp });
 
   sendResponse(res, {
     success: true,
@@ -16,10 +16,10 @@ const verifyPhoneToDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const resendVerifyPhone = catchAsync(
+const resendVerifyEmail = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { phone } = req.body;
-    const result = await AuthService.resendVerifyPhone(phone);
+    const { email } = req.body;
+    const result = await AuthService.resendVerifyEmail(email);
 
     sendResponse(res, {
       success: true,
@@ -31,8 +31,8 @@ const resendVerifyPhone = catchAsync(
 );
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const { phone, password } = req.body;
-  const result = await AuthService.loginUserFromDB({ phone, password });
+  const { email, password } = req.body;
+  const result = await AuthService.loginUserFromDB({ email, password });
 
   res.cookie('refreshToken', result.refreshToken, {
     httpOnly: true,
@@ -45,7 +45,10 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'User logged in successfully.',
-    data: { accessToken: result.accessToken },
+    data: {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    },
   });
 });
 
@@ -88,10 +91,8 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const AuthController = {
-  // verifyEmail,
-  // resendVerifyEmail,
-  resendVerifyPhone,
-  verifyPhoneToDB,
+  verifyEmail,
+  resendVerifyEmail,
   loginUser,
   forgetPassword,
   resetPassword,

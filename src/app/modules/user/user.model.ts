@@ -55,9 +55,31 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    authentication: {
+      type: {
+        isResetPassword: {
+          type: Boolean,
+          default: false,
+        },
+        oneTimeCode: {
+          type: Number,
+          default: null,
+        },
+        expireAt: {
+          type: Date,
+          default: null,
+        },
+      },
+      select: 0,
+    },
   },
   { timestamps: true, versionKey: false },
 );
+
+userSchema.statics.isExistUserById = async (id: string) => {
+  const isExist = await User.findById(id);
+  return isExist;
+};
 
 //check user
 userSchema.pre('save', async function () {

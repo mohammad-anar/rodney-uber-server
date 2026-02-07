@@ -3,23 +3,23 @@ import { UserController } from './user.controller';
 import fileUploadHandler from '../../middlewares/fileUploadHandler';
 import validateRequest from '../../middlewares/validateRequest';
 import { UserValidation } from './user.validation';
+import auth from '../../middlewares/auth';
+import { USER_ROLES } from '../../../enums/user';
 
 const router = express.Router();
 
-router.get('/', UserController.getAllUsers);
+router.get('/', auth(USER_ROLES.ADMIN), UserController.getAllUsers);
 router.post(
   '/',
+  auth(USER_ROLES.ADMIN),
   fileUploadHandler(),
   validateRequest(UserValidation.createUserZodSchema),
   UserController.createUser,
 );
-router.get(
-  '/:id',
-
-  UserController.getUserById,
-);
+router.get('/:id', auth(USER_ROLES.ADMIN), UserController.getUserById);
 router.patch(
   '/:id',
+  auth(USER_ROLES.ADMIN),
   fileUploadHandler(),
   validateRequest(UserValidation.updateUserZodSchema),
   UserController.updateUser,

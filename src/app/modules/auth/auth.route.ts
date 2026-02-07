@@ -21,12 +21,12 @@ router.post(
 router.post(
   '/verify-otp',
   validateRequest(AuthValidation.createVerifyEmailZodSchema),
-  AuthController.verifyPhoneToDB,
+  AuthController.verifyEmail,
 );
 router.post(
   '/resend-otp',
   validateRequest(AuthValidation.resendVerifyEmailZodSchema),
-  AuthController.resendVerifyPhone,
+  AuthController.resendVerifyEmail,
 );
 
 router.post(

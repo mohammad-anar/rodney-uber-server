@@ -10,7 +10,7 @@ const createUser = async (payload: IUser) => {
 };
 // get all users
 const getAllUsers = async (query: IQueryParams) => {
-  console.log('Get all users');
+
   const modelQuery = User.find().select('-password');
 
   const qb = new QueryBuilder(modelQuery, query);
