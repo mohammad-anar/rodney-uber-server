@@ -46,7 +46,6 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload = req.body;
-  console.log(payload);
   const image = getSingleFilePath(req.files, 'image') as string;
   const url = `http://${config.ip_address}:${config.port}`.concat(image);
   if (image) {

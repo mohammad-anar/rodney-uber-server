@@ -17,7 +17,6 @@ const createUser = async (payload: IUser) => {
     otp: otp,
     email: result.email!,
   };
-  console.log({ values });
   const createAccountTemplate = await emailTemplate.createAccount(values);
   await emailHelper.sendEmail(createAccountTemplate);
 

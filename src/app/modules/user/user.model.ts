@@ -89,7 +89,7 @@ userSchema.pre('save', async function () {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
   }
 
-  console.log('From pre save hook');
+
   //password hash
   this.password = await bcrypt.hash(
     this.password,

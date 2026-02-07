@@ -14,7 +14,7 @@ export const sendOTPViaSMS = async (phone: string) => {
         channel: 'sms',
       });
 
-    console.log({ verification }, 'from twilio');
+    // console.log({ verification }, 'from twilio');
     return verification;
   } catch (err) {
     console.error('Error sending OTP via SMS', err);
