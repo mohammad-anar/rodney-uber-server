@@ -24,6 +24,6 @@ router.patch(
   VideoController.updateVideo,
 );
 
-router.get('/:id', VideoController.deleteVideo);
+router.delete('/:id', VideoController.deleteVideo);
 
 export const VideoRouter = router;

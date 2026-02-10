@@ -9,3 +9,9 @@ const unlinkFile = (file: string) => {
 };
 
 export default unlinkFile;
+
+
+export const extractPathFromUrl = (url: string) => {
+  const parsedUrl = new URL(url);
+  return parsedUrl.pathname;
+};

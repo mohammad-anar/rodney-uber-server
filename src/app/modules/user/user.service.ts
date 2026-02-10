@@ -1,5 +1,6 @@
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import unlinkFile, { extractPathFromUrl } from '../../../shared/unlinkFile';
 import { IQueryParams } from '../../../types/pagination';
 import generateOTP from '../../../util/generateOTP';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -50,6 +51,12 @@ const getUserById = async (id: string) => {
 
 // update user
 const updateUser = async (id: string, payload: Partial<IUser>) => {
+  const existingUser = await User.findById(id);
+
+  if (existingUser?.profilePhoto && payload.profilePhoto) {
+    unlinkFile(extractPathFromUrl(existingUser?.profilePhoto));
+  }
+
   const result = await User.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
