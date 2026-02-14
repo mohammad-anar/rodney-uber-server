@@ -22,10 +22,53 @@ const getAllCoupons = catchAsync(async (req: Request, res: Response) => {
 
   sendResponse(res, {
     success: true,
+    message: 'Coupons retrieve successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+const getCouponById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await CouponServices.getCouponById(id as string);
+
+  sendResponse(res, {
+    success: true,
     message: 'Coupon retrieve successfully',
     statusCode: 200,
     data: result,
   });
 });
+const updateCoupon = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const payload = req.body;
 
-export const CouponController = { createCoupon, getAllCoupons };
+  const result = await CouponServices.updateCoupon(id as string, payload);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Coupon updated successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await CouponServices.deleteCoupon(id as string);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Coupon deleted successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+
+export const CouponController = {
+  createCoupon,
+  getAllCoupons,
+  getCouponById,
+  updateCoupon,
+  deleteCoupon,
+};

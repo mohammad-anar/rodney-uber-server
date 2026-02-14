@@ -11,5 +11,12 @@ router.get(
   CouponController.getAllCoupons,
 );
 router.post('/', auth(USER_ROLES.ADMIN), CouponController.createCoupon);
+router.get(
+  '/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  CouponController.getCouponById,
+);
+router.patch('/:id', auth(USER_ROLES.ADMIN), CouponController.updateCoupon);
+router.delete('/:id', auth(USER_ROLES.ADMIN), CouponController.deleteCoupon);
 
 export const CouponRouter = router;
