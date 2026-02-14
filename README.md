@@ -103,12 +103,3 @@ Ensure you have the following installed:
    yarn run dev
    ```
 
-### Running the Tests
-
-Explain how to run the automated tests for this system.
-
-```bash
-npm test
-```
-
-# TS-Template
