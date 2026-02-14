@@ -4,14 +4,14 @@ import mongoose from 'mongoose';
 export const createCouponUsageSchema = z.object({
   email: z
     .string({
-      required_error: 'Email is required',
+      message: 'Email is required',
     })
     .email('Invalid email address')
     .toLowerCase(),
 
   coupon: z
     .string({
-      required_error: 'Coupon ID is required',
+      message: 'Coupon ID is required',
     })
     .refine(val => mongoose.Types.ObjectId.isValid(val), {
       message: 'Invalid coupon ID',
@@ -19,7 +19,7 @@ export const createCouponUsageSchema = z.object({
 
   video: z
     .string({
-      required_error: 'Video ID is required',
+      message: 'Video ID is required',
     })
     .refine(val => mongoose.Types.ObjectId.isValid(val), {
       message: 'Invalid video ID',
