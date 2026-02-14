@@ -5,6 +5,7 @@ import { VideoRouter } from '../app/modules/video/video.routes';
 import { HelpRouter } from '../app/modules/help/help.routes';
 import { CouponRouter } from '../app/modules/coupon/coupon.routes';
 import { CouponUsageRouter } from '../app/modules/couponUsage/couponUsage.routes';
+import { RefreshTokenRouter } from '../app/modules/resetToken/refreshToken.service';
 const router = express.Router();
 
 const apiRoutes = [
@@ -15,6 +16,10 @@ const apiRoutes = [
   {
     path: '/auth',
     route: AuthRoutes,
+  },
+  {
+    path: '/refresh-token',
+    route: RefreshTokenRouter,
   },
   {
     path: '/video',

@@ -15,9 +15,9 @@ import {
 } from '../../../types/auth';
 import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
-import { ResetToken } from '../resetToken/resetToken.model';
 import { IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
+import { ResetToken } from '../resetToken/resetToken.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
