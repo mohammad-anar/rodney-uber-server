@@ -10,7 +10,7 @@ const createCoupon = catchAsync(async (req: Request, res: Response) => {
 
   sendResponse(res, {
     success: true,
-    message: 'Video uploaded successfully',
+    message: 'Coupon created successfully',
     statusCode: 201,
     data: result,
   });
