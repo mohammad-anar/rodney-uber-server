@@ -3,9 +3,6 @@ import mongoose from 'mongoose';
 
 export const createCouponUsageSchema = z.object({
   email: z
-    .string({
-      message: 'Email is required',
-    })
     .email('Invalid email address')
     .toLowerCase(),
 
