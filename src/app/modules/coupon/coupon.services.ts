@@ -1,6 +1,8 @@
+import mongoose from 'mongoose';
 import ApiError from '../../../errors/ApiError';
 import { IQueryParams } from '../../../types/pagination';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { CouponUsage } from '../couponUsage/couponUsage.model';
 import { ICoupon } from './coupon.interfaces';
 import { Coupon } from './coupon.model';
 import statusCode from 'http-status-codes';
@@ -30,6 +32,62 @@ const getCouponById = async (id: string) => {
   }
   return result;
 };
+
+const getRandomCoupon = async (email: string, videoId: string) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const coupons = await Coupon.aggregate([
+      {
+        $match: {
+          isActive: true,
+          expiredAt: { $gt: new Date() },
+        },
+      },
+      { $sample: { size: 1 } },
+    ]).session(session);
+
+    if (!coupons.length) {
+      throw new ApiError(statusCode.NOT_FOUND, 'No available coupon found');
+    }
+
+    const coupon = coupons[0];
+
+    const alreadyUsed = await CouponUsage.findOne({
+      email: email.toLowerCase(),
+      video: videoId,
+    }).session(session);
+
+    if (alreadyUsed) {
+      throw new ApiError(
+        statusCode.BAD_REQUEST,
+        'You have already claimed a coupon for this video',
+      );
+    }
+
+    await CouponUsage.create(
+      [
+        {
+          email: email.toLowerCase(),
+          coupon: coupon._id,
+          video: videoId,
+        },
+      ],
+      { session },
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return coupon;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 const updateCoupon = async (id: string, payload: Partial<ICoupon>) => {
   const result = await Coupon.findByIdAndUpdate(id, payload, {
     new: true,
@@ -49,6 +107,7 @@ export const CouponServices = {
   createCoupon,
   getAllCoupons,
   getCouponById,
+  getRandomCoupon,
   updateCoupon,
   deleteCoupon,
 };

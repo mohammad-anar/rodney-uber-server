@@ -5,17 +5,14 @@ import { USER_ROLES } from '../../../enums/user';
 
 const router = express.Router();
 
-router.get(
-  '/',
+router.get('/', auth(USER_ROLES.ADMIN), CouponController.getAllCoupons);
+router.post(
+  '/random',
   auth(USER_ROLES.ADMIN, USER_ROLES.USER),
-  CouponController.getAllCoupons,
+  CouponController.getRandomCoupon,
 );
 router.post('/', auth(USER_ROLES.ADMIN), CouponController.createCoupon);
-router.get(
-  '/:id',
-  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
-  CouponController.getCouponById,
-);
+router.get('/:id', auth(USER_ROLES.ADMIN), CouponController.getCouponById);
 router.patch('/:id', auth(USER_ROLES.ADMIN), CouponController.updateCoupon);
 router.delete('/:id', auth(USER_ROLES.ADMIN), CouponController.deleteCoupon);
 

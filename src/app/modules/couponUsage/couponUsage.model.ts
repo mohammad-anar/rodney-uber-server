@@ -22,4 +22,6 @@ const couponUsageSchema = new Schema(
   { timestamps: true },
 );
 
+couponUsageSchema.index({ email: 1, video: 1 }, { unique: true });
+
 export const CouponUsage = model('CouponUsage', couponUsageSchema);

@@ -39,6 +39,18 @@ const getCouponById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getRandomCoupon = catchAsync(async (req: Request, res: Response) => {
+  const { email, videoId } = req.body;
+
+  const result = await CouponServices.getRandomCoupon(email, videoId);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Coupon retrieve successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
 const updateCoupon = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload = req.body;
@@ -71,4 +83,5 @@ export const CouponController = {
   getCouponById,
   updateCoupon,
   deleteCoupon,
+  getRandomCoupon,
 };
