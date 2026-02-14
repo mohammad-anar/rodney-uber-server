@@ -22,3 +22,22 @@ export const createCouponUsageSchema = z.object({
       message: 'Invalid video ID',
     }),
 });
+
+export const updateCouponUsageSchema = z.object({
+  email: z.string().email('Invalid email address').toLowerCase().optional(),
+
+  coupon: z
+    .string()
+    .refine(val => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid coupon ID',
+    })
+    .optional(),
+
+  video: z
+    .string()
+    .refine(val => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid video ID',
+    })
+    .optional(),
+});
+
