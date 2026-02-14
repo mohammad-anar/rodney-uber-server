@@ -3,6 +3,7 @@ import { AuthRoutes } from '../app/modules/auth/auth.route';
 import { UserRouter } from '../app/modules/user/user.route';
 import { VideoRouter } from '../app/modules/video/video.routes';
 import { HelpRouter } from '../app/modules/help/help.routes';
+import { CouponRouter } from '../app/modules/coupon/coupon.routes';
 const router = express.Router();
 
 const apiRoutes = [
@@ -17,6 +18,10 @@ const apiRoutes = [
   {
     path: '/video',
     route: VideoRouter,
+  },
+  {
+    path: '/coupon',
+    route: CouponRouter,
   },
   {
     path: '/help-request',
