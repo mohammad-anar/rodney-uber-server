@@ -5,6 +5,11 @@ import { USER_ROLES } from '../../../enums/user';
 
 const router = express.Router();
 
+router.get(
+  '/',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  CouponController.getAllCoupons,
+);
 router.post('/', auth(USER_ROLES.ADMIN), CouponController.createCoupon);
 
 export const CouponRouter = router;

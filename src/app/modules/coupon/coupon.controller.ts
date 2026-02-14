@@ -15,5 +15,17 @@ const createCoupon = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getAllCoupons = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
 
-export const CouponController = { createCoupon };
+  const result = await CouponServices.getAllCoupons(query);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Coupon retrieve successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+
+export const CouponController = { createCoupon, getAllCoupons };

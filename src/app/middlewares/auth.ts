@@ -14,6 +14,12 @@ const auth =
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'You are not authorized');
       }
 
+      if (tokenWithBearer && !tokenWithBearer.startsWith('Bearer')) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'Invalid Token format! Token must startsWith Bearer',
+        );
+      }
       if (tokenWithBearer && tokenWithBearer.startsWith('Bearer')) {
         const token = tokenWithBearer.split(' ')[1];
 
