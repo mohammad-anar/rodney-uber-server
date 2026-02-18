@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
+import config from '../../../config';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { email, otp } = req.body;
@@ -34,13 +35,6 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const result = await AuthService.loginUserFromDB({ email, password });
 
-  res.cookie('refreshToken', result.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
-    maxAge: 1000 * 60 * 60 * 24 * 30,
-  });
-
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -48,6 +42,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     data: {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
+      user: result.user,
     },
   });
 });

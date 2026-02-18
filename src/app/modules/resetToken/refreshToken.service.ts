@@ -13,6 +13,8 @@ router.get(
   '/',
   catchAsync(async (req: Request, res: Response) => {
     const tokenWithBearer = req.headers.authorization;
+
+    console.log(tokenWithBearer, req.cookies?.refreshToken);
     let accessToken;
 
     if (!tokenWithBearer) {

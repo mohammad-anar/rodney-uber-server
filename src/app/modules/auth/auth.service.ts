@@ -21,8 +21,9 @@ import { ResetToken } from '../resetToken/resetToken.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
-  const { email, password } = payload;
-  const isExistUser = await User.findOne({ email }).select('+password');
+  const isExistUser = await User.findOne({ email: payload.email }).select(
+    '+password',
+  );
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -42,10 +43,13 @@ const loginUserFromDB = async (payload: ILoginData) => {
       'You don’t have permission to access this content.It looks like your account has been deactivated.',
     );
   }
-  const isMatchPassword = await bcrypt.compare(password, isExistUser.password);
+  const isMatchPassword = await bcrypt.compare(
+    payload.password,
+    isExistUser.password,
+  );
 
   //check match password
-  if (password && !isMatchPassword) {
+  if (payload.password && !isMatchPassword) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
   }
 
@@ -73,7 +77,9 @@ const loginUserFromDB = async (payload: ILoginData) => {
     '30d',
   );
 
-  return { accessToken, refreshToken };
+  const { password, ...rest } = isExistUser.toObject();
+
+  return { accessToken, refreshToken, user: rest };
 };
 
 //forget password

@@ -11,6 +11,7 @@ const auth =
     try {
       const tokenWithBearer = req.headers.authorization;
       if (!tokenWithBearer) {
+        res.cookie('accessToken', null);
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'You are not authorized');
       }
 

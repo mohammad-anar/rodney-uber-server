@@ -6,11 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthValidation } from './auth.validation';
 const router = express.Router();
 
-router.post(
-  '/login',
-  validateRequest(AuthValidation.createLoginZodSchema),
-  AuthController.loginUser,
-);
+router.post('/login', AuthController.loginUser);
 
 router.post(
   '/forget-password',
