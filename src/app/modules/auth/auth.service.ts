@@ -73,7 +73,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
       name: isExistUser.name,
       phone: isExistUser.phone,
     },
-    config.jwt.jwt_secret as Secret,
+    config.jwt.jwt_refresh_secret as Secret,
     '30d',
   );
 

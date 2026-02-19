@@ -34,7 +34,9 @@ const createUser = async (payload: IUser) => {
 };
 // get all users
 const getAllUsers = async (query: IQueryParams) => {
-  const modelQuery = User.find().select('-password');
+  const modelQuery = User.find({
+    role: { $ne: 'ADMIN' },
+  }).select('-password');
 
   const qb = new QueryBuilder(modelQuery, query);
   qb.search(['name', 'email']).sort().filter().paginate().fields();

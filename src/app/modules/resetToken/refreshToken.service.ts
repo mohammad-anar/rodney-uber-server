@@ -12,48 +12,54 @@ const router = express.Router();
 router.get(
   '/',
   catchAsync(async (req: Request, res: Response) => {
+    // You can get refresh token from header OR cookie
     const tokenWithBearer = req.headers.authorization;
+    const cookieToken = req.cookies?.refreshToken;
 
-    console.log(tokenWithBearer, req.cookies?.refreshToken);
-    let accessToken;
+    let refreshToken: string | undefined;
 
-    if (!tokenWithBearer) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'You are not authorized');
+    if (tokenWithBearer?.startsWith('Bearer ')) {
+      refreshToken = tokenWithBearer.split(' ')[1];
+    } else if (cookieToken) {
+      refreshToken = cookieToken;
     }
 
-    if (tokenWithBearer && !tokenWithBearer.startsWith('Bearer')) {
+    if (!refreshToken) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token found');
+    }
+
+    let verifiedUser;
+
+    try {
+      // ✅ VERIFY using REFRESH SECRET (NOT access secret)
+      verifiedUser = jwtHelper.verifyToken(
+        refreshToken,
+        config.jwt.jwt_refresh_secret as Secret,
+      );
+    } catch (error) {
       throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Invalid Token format! Token must startsWith Bearer',
+        StatusCodes.UNAUTHORIZED,
+        'Invalid or expired refresh token',
       );
     }
 
-    if (tokenWithBearer && tokenWithBearer.startsWith('Bearer')) {
-      const token = tokenWithBearer.split(' ')[1];
+    // Remove JWT internal fields
+    const { iat, exp, ...payload } = verifiedUser;
 
-      //verify token
-      const verifyUser = jwtHelper.verifyToken(
-        token,
-        config.jwt.jwt_secret as Secret,
-      );
-
-      if (verifyUser) {
-        const { exp, iat, ...payloadWithoutExp } = verifyUser;
-
-        const token = jwtHelper.createToken(
-          payloadWithoutExp,
-          config.jwt.jwt_secret as Secret,
-          config.jwt.jwt_expire_in as SignOptions['expiresIn'],
-        );
-        accessToken = token;
-      }
-    }
+    // ✅ Create NEW ACCESS TOKEN using ACCESS SECRET
+    const newAccessToken = jwtHelper.createToken(
+      payload,
+      config.jwt.jwt_secret as Secret, // access secret
+      config.jwt.jwt_expire_in as SignOptions['expiresIn'], 
+    );
 
     sendResponse(res, {
       success: true,
       message: 'Access token retrieve successfully',
       statusCode: 200,
-      data: { accessToken },
+      data: {
+        accessToken: newAccessToken,
+      },
     });
   }),
 );
