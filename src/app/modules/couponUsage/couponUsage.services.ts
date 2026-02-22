@@ -1,4 +1,6 @@
 import ApiError from '../../../errors/ApiError';
+import { IQueryParams } from '../../../types/pagination';
+import QueryBuilder from '../../builder/QueryBuilder';
 import { CouponUsage } from './couponUsage.model';
 import httpStatus from 'http-status-codes';
 
@@ -19,5 +21,14 @@ const checkEmailUsage = async (email: string) => {
     used: false,
   };
 };
+const getVideoCompletionLogs = async (query: IQueryParams) => {
+  const modelQuery = CouponUsage.find();
 
-export const CouponUsageService = { checkEmailUsage };
+  const qb = new QueryBuilder(modelQuery, query);
+  qb.search(['email', 'coupon']).sort().filter().paginate().fields();
+  const result = await qb.modelQuery;
+  const pagination = await qb.getPaginationInfo();
+  return { meta: pagination, data: result };
+};
+
+export const CouponUsageService = { checkEmailUsage, getVideoCompletionLogs };

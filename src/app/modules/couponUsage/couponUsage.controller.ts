@@ -16,5 +16,22 @@ const checkEmailUsage = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getVideoCompletionLogs = catchAsync(
+  async (req: Request, res: Response) => {
+    const query = req.query;
 
-export const CouponUsageController = { checkEmailUsage };
+    const result = await CouponUsageService.getVideoCompletionLogs(query);
+
+    sendResponse(res, {
+      success: true,
+      message: 'Email is eligible to claim coupon.',
+      statusCode: 200,
+      data: result,
+    });
+  },
+);
+
+export const CouponUsageController = {
+  checkEmailUsage,
+  getVideoCompletionLogs,
+};
