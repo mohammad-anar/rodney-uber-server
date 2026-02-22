@@ -25,7 +25,14 @@ const getVideoCompletionLogs = async (query: IQueryParams) => {
   const modelQuery = CouponUsage.find();
 
   const qb = new QueryBuilder(modelQuery, query);
-  qb.search(['email', 'coupon']).sort().filter().paginate().fields();
+  qb.search(['email', 'coupon'])
+    .sort()
+    .filter()
+    .paginate()
+    .fields()
+    .populate(['coupon'], {
+      coupon: '',
+    });
   const result = await qb.modelQuery;
   const pagination = await qb.getPaginationInfo();
   return { meta: pagination, data: result };
