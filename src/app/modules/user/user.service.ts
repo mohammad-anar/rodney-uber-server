@@ -63,7 +63,9 @@ const updateUser = async (id: string, payload: Partial<IUser>) => {
   const result = await User.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
-  });
+  }).select(
+    '_id name email phone profilePhoto role status createdAt updatedAt',
+  );
   return result;
 };
 
