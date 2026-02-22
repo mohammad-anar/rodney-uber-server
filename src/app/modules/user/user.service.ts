@@ -1,3 +1,4 @@
+import { UserStatus } from '../../../enums/user';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import unlinkFile, { extractPathFromUrl } from '../../../shared/unlinkFile';
@@ -77,10 +78,32 @@ const deleteUser = async (id: string) => {
   return result;
 };
 
+const getUserStats = async () => {
+  // Total users
+  const total = await User.countDocuments();
+
+  // Active users
+  const active = await User.countDocuments({ status: UserStatus.ACTIVE });
+
+  // Blocked users
+  const blocked = await User.countDocuments({ status: UserStatus.BLOCKED });
+
+  // Deleted users
+  const deleted = await User.countDocuments({ status: UserStatus.DELETED });
+
+  return {
+    total,
+    active,
+    blocked,
+    deleted,
+  };
+};
+
 export const UserService = {
   createUser,
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
+  getUserStats,
 };

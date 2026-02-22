@@ -15,6 +15,7 @@ router.post(
   validateRequest(UserValidation.createUserZodSchema),
   UserController.createUser,
 );
+router.get('/stats', auth(USER_ROLES.ADMIN), UserController.getUserStats);
 router.get('/:id', auth(USER_ROLES.ADMIN), UserController.getUserById);
 router.patch(
   '/:id',

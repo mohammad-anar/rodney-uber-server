@@ -71,6 +71,17 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getUserStats = catchAsync(async (req: Request, res: Response) => {
+
+  const result = await UserService.getUserStats();
+
+  sendResponse(res, {
+    success: true,
+    message: 'User stats retrieve successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
 
 export const UserController = {
   createUser,
@@ -78,4 +89,5 @@ export const UserController = {
   getUserById,
   updateUser,
   deleteUser,
+  getUserStats,
 };
