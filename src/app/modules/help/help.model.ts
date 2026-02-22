@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { HelpRequestStatus } from './help.interfaces';
 
 const helpRequestSchema = new mongoose.Schema(
   {
@@ -26,13 +27,18 @@ const helpRequestSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    status: {
+      type: String,
+      enum: Object.values(HelpRequestStatus),
+      default: HelpRequestStatus.UNDER_REVIEW,
+    },
 
     supportingDocument: {
       type: [String],
       default: [],
     },
   },
-  { timestamps: true },
+  { timestamps: true, versionKey: false },
 );
 
 export const HelpRequest = mongoose.model('HelpRequest', helpRequestSchema);

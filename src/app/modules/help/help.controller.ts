@@ -34,7 +34,8 @@ const createHelpRequest = catchAsync(async (req: Request, res: Response) => {
 
 //
 const getAllHelpRequests = catchAsync(async (req: Request, res: Response) => {
-  const result = await HelpRequestServices.getAllHelpRequests();
+  const query = req.query;
+  const result = await HelpRequestServices.getAllHelpRequests(query);
 
   sendResponse(res, {
     success: true,

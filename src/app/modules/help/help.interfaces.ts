@@ -8,3 +8,8 @@ export interface IHelpRequest {
   createdAt?: Date;
   updatedAt?: Date;
 }
+export enum HelpRequestStatus {
+  APPROVED = 'Approved',
+  REJECTED = 'Rejected',
+  UNDER_REVIEW = 'UnderReview',
+}

@@ -25,7 +25,7 @@ router.patch(
   fileUploadHandler(),
   auth(USER_ROLES.USER, USER_ROLES.ADMIN),
   validateRequest(updateHelpRequestSchema),
-  HelpRequestController.createHelpRequest,
+  HelpRequestController.updateHelpRequest,
 );
 router.delete('/:id', HelpRequestController.deleteHelpRequestById);
 
