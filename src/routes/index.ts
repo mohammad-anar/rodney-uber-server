@@ -6,6 +6,7 @@ import { HelpRouter } from '../app/modules/help/help.routes';
 import { CouponRouter } from '../app/modules/coupon/coupon.routes';
 import { CouponUsageRouter } from '../app/modules/couponUsage/couponUsage.routes';
 import { RefreshTokenRouter } from '../app/modules/resetToken/refreshToken.service';
+import { AnalyticsRouter } from '../app/modules/analytics/analytics.routes';
 const router = express.Router();
 
 const apiRoutes = [
@@ -36,6 +37,10 @@ const apiRoutes = [
   {
     path: '/help-request',
     route: HelpRouter,
+  },
+  {
+    path: '/analytics',
+    route: AnalyticsRouter,
   },
 ];
 
