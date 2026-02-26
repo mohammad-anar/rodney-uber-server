@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import dotenv from 'dotenv';
 import path from 'path';
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+dotenv.config({ path: '/etc/secrets/.env' });
 
 export default {
   ip_address: process.env.IP_ADDRESS || '0.0.0.0',
