@@ -6,6 +6,7 @@ import { USER_ROLES } from '../../../enums/user';
 const router = express.Router();
 
 router.post('/check-email', CouponUsageController.checkEmailUsage);
+router.post('/verify-email', CouponUsageController.verifyEmail);
 router.get(
   '/',
   auth(USER_ROLES.ADMIN),

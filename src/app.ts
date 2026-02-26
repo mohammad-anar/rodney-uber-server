@@ -15,11 +15,20 @@ app.use(Morgan.errorHandler);
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    credentials: true, // ✅ Allow cookies to be sent
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        origin === 'http://localhost:3000' ||
+        origin.endsWith('.vercel.app')
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
   }),
 );
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
