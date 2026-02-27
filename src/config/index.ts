@@ -3,9 +3,13 @@ import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI is not set in environment variables!');
+}
+
 export default {
   ip_address: process.env.IP_ADDRESS || '0.0.0.0',
-  database_url: process.env.DATABASE_URL,
+  database_url: process.env.MONGO_URI,
   node_env: process.env.NODE_ENV,
   port: process.env.PORT,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
