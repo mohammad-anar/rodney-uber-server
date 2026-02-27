@@ -10,6 +10,8 @@ import config from './config';
 import { seedSuperAdmin } from './DB/seedAdmin';
 import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
+import cron from 'node-cron';
+import axios from 'axios';
 
 //uncaught exception
 process.on('uncaughtException', error => {
@@ -35,6 +37,18 @@ async function main() {
       logger.info(
         colors.yellow(`♻️  Application listening on ${host}:${port}`),
       );
+    });
+
+    const LIVE_URL =
+      process.env.RENDER_URL || 'https://rodney-uber-server-crj2.onrender.com';
+
+    cron.schedule('*/5 * * * *', async () => {
+      try {
+        const res = await axios.get(`${LIVE_URL}/`);
+        console.log('Cron ping:', res.data);
+      } catch (err) {
+        console.error('Cron error:', err);
+      }
     });
 
     //socket
