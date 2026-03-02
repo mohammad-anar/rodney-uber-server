@@ -59,11 +59,7 @@ Ensure you have the following installed:
    npm install
    ```
 
-   Using yarn:
 
-   ```bash
-   yarn install
-   ```
 
 
 
@@ -73,11 +69,5 @@ Ensure you have the following installed:
 
    ```bash
    npm run dev
-   ```
-
-   Using yarn:
-
-   ```bash
-   yarn run dev
    ```
 
