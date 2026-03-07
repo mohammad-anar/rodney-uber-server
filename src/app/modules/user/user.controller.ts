@@ -47,7 +47,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload = req.body;
   const image = getSingleFilePath(req.files, 'image') as string;
-  const url = `http://10.10.7.111:5000`.concat(image);
+  const url = `https://api.zeroproofdrive.org`.concat(image);
   if (image) {
     payload.profilePhoto = url;
   }
