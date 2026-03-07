@@ -13,8 +13,8 @@ const createVideo = catchAsync(async (req: Request, res: Response) => {
   if (!image || !media) {
     throw new ApiError(404, 'Thumbnail and Video file is required');
   }
-  const thumbnail = `http://${config.ip_address}:${config.port}`.concat(image);
-  const url = `http://${config.ip_address}:${config.port}`.concat(media);
+  const thumbnail = `https://api.zeroproofdrive.org`.concat(image);
+  const url = `https://api.zeroproofdrive.org`.concat(media);
   const result = await VideoService.createVideo({ ...payload, thumbnail, url });
 
   sendResponse(res, {
@@ -43,14 +43,12 @@ const updateVideo = catchAsync(async (req: Request, res: Response) => {
   const media = getSingleFilePath(req.files, 'media') as string;
   const updatePayload: any = {};
   if (image) {
-    const thumbnail = `http://${config.ip_address}:${config.port}`.concat(
-      image,
-    );
+    const thumbnail = `https://api.zeroproofdrive.org`.concat(image);
     updatePayload.thumbnail = thumbnail;
   }
 
   if (media) {
-    const url = `http://${config.ip_address}:${config.port}`.concat(media);
+    const url = `https://api.zeroproofdrive.org`.concat(media);
     updatePayload.url = url;
   }
 

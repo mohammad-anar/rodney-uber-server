@@ -8,7 +8,7 @@ import config from '../../../config';
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   const image = getSingleFilePath(req.files, 'image') as string;
-  const url = `http://${config.ip_address}:${config.port}`.concat(image);
+  const url = `https://api.zeroproofdrive.org`.concat(image);
   const result = await UserService.createUser({
     ...payload,
     profilePhoto: url,

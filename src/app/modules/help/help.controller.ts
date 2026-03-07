@@ -16,7 +16,7 @@ const createHelpRequest = catchAsync(async (req: Request, res: Response) => {
     | undefined;
 
   const supportingDocument = documents
-    ? documents.map(doc => `http://${config.ip_address}:${config.port}${doc}`)
+    ? documents.map(doc => `https://api.zeroproofdrive.org${doc}`)
     : [];
 
   const result = await HelpRequestServices.createHelpRequest({
@@ -67,7 +67,7 @@ const updateHelpRequest = catchAsync(async (req: Request, res: Response) => {
 
   if (documents) {
     const supportingDocument = documents
-      ? documents.map(doc => `http://${config.ip_address}:${config.port}${doc}`)
+      ? documents.map(doc => `https://api.zeroproofdrive.org${doc}`)
       : [];
 
     updatePayload.supportingDocument = supportingDocument;
