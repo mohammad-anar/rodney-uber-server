@@ -13,12 +13,17 @@ const app = express();
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://dashboard.zeroproofdrive.org',
+];
+
 app.use(
   cors({
     origin: (origin, callback) => {
       if (
         !origin ||
-        origin === 'http://localhost:3000' ||
+        allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app')
       ) {
         callback(null, true);
