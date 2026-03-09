@@ -1,0 +1,38 @@
+version: '3.8'
+ 
+services:
+  # The Node.js API Service
+  api:
+    build: .
+    container_name: rodney-uber-api
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      # Use the service name 'mongodb' as the host in your connection string
+      - MONGO_URI=mongodb://mongodb:27017/rodney_db
+      - PORT=5000
+      - NODE_ENV=production
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+    networks:
+      - backend-network
+ 
+  # The MongoDB Service
+  mongodb:
+    image: mongo:latest
+    container_name: rodney-uber-db
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend-network
+ 
+networks:
+  backend-network:
+    driver: bridge
+ 
+volumes:
+  mongo-data:
