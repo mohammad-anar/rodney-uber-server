@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (values: ISendEmail) => {
   try {
     const info = await transporter.sendMail({
-      from: `"Simply Good Food" <${config.email.from}>`,
+      from: `"Zero Proof Driving" <${config.email.from}>`,
       to: values.to,
       subject: values.subject,
       html: values.html,
