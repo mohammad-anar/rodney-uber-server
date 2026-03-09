@@ -21,9 +21,9 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY wait-for-mongo.sh /wait-for-mongo.sh
-RUN chmod +x /wait-for-mongo.sh
+COPY wait-for-mongo.sh ./   # <-- add this line
+RUN chmod +x wait-for-mongo.sh  # make it executable
 
 EXPOSE 5000
 
-CMD ["/wait-for-mongo.sh"]
+CMD ["sh", "./wait-for-mongo.sh"]
