@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import ApiError from '../../../errors/ApiError';
 import { IQueryParams } from '../../../types/pagination';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -34,58 +33,41 @@ const getCouponById = async (id: string) => {
 };
 
 const getRandomCoupon = async (email: string, videoId: string) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
-    const coupons = await Coupon.aggregate([
-      {
-        $match: {
-          isActive: true,
-          expiredAt: { $gt: new Date() },
-        },
+  const coupons = await Coupon.aggregate([
+    {
+      $match: {
+        isActive: true,
+        expiredAt: { $gt: new Date() },
       },
-      { $sample: { size: 1 } },
-    ]).session(session);
+    },
+    { $sample: { size: 1 } },
+  ]);
 
-    if (!coupons.length) {
-      throw new ApiError(statusCode.NOT_FOUND, 'No available coupon found');
-    }
-
-    const coupon = coupons[0];
-
-    const alreadyUsed = await CouponUsage.findOne({
-      email: email.toLowerCase(),
-      video: videoId,
-    }).session(session);
-
-    if (alreadyUsed) {
-      throw new ApiError(
-        statusCode.BAD_REQUEST,
-        'You have already claimed a coupon for this video',
-      );
-    }
-
-    await CouponUsage.create(
-      [
-        {
-          email: email.toLowerCase(),
-          coupon: coupon._id,
-          video: videoId,
-        },
-      ],
-      { session },
-    );
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return coupon;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
+  if (!coupons.length) {
+    throw new ApiError(statusCode.NOT_FOUND, 'No available coupon found');
   }
+
+  const coupon = coupons[0];
+
+  const alreadyUsed = await CouponUsage.findOne({
+    email: email.toLowerCase(),
+    video: videoId,
+  });
+
+  if (alreadyUsed) {
+    throw new ApiError(
+      statusCode.BAD_REQUEST,
+      'You have already claimed a coupon for this video',
+    );
+  }
+
+  await CouponUsage.create({
+    email: email.toLowerCase(),
+    coupon: coupon._id,
+    video: videoId,
+  });
+
+  return coupon;
 };
 
 const updateCoupon = async (id: string, payload: Partial<ICoupon>) => {
