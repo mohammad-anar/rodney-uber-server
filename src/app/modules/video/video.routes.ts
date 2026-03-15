@@ -9,6 +9,7 @@ import { createVideoSchema, updateVideoSchema } from './video.validation';
 const router = express.Router();
 
 router.get('/', VideoController.getVideos);
+router.get('/:id/stream', VideoController.streamVideo);
 router.post(
   '/',
   fileUploadHandler(),
