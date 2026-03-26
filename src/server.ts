@@ -12,13 +12,13 @@ import { socketHelper } from './helpers/socketHelper';
 import { errorLogger, logger } from './shared/logger';
 import cron from 'node-cron';
 import axios from 'axios';
+import { User } from './app/modules/user/user.model';
 
 //uncaught exception
 process.on('uncaughtException', error => {
   errorLogger.error('UnhandledException Detected', error);
   process.exit(1);
 });
-console.log(process.env.SUPER_ADMIN_EMAIL);
 let server: any;
 async function main() {
   try {
@@ -27,6 +27,8 @@ async function main() {
 
     //Seed Super Admin after database connection is successful
     await seedSuperAdmin();
+
+    await User.collection.dropIndex('phone_1');
 
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port);
