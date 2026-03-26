@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
-      sparse: true,
     },
 
     password: {
@@ -88,7 +87,6 @@ userSchema.pre('save', async function () {
   if (isExist) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
   }
-
 
   //password hash
   this.password = await bcrypt.hash(
