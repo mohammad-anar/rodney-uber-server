@@ -76,7 +76,9 @@ const deleteUser = async (id: string) => {
   const existingUser = await User.findById(id);
 
   if (existingUser?.profilePhoto) {
-    unlinkFile(extractPathFromUrl(existingUser?.profilePhoto));
+    if (extractPathFromUrl(existingUser?.profilePhoto)) {
+      unlinkFile(extractPathFromUrl(existingUser?.profilePhoto));
+    }
   }
   const result = await User.findByIdAndDelete(id);
   return result;

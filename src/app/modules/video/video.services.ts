@@ -14,10 +14,14 @@ const updateVideo = async (id: string, payload: Partial<IVideo>) => {
   const existingVideo = await Video.findById(id);
 
   if (existingVideo?.url && payload.url) {
-    unlinkFile(extractPathFromUrl(existingVideo?.url));
+    if(extractPathFromUrl(existingVideo?.url)) {
+      unlinkFile(extractPathFromUrl(existingVideo?.url));
+    }
   }
   if (existingVideo?.thumbnail && payload.thumbnail) {
-    unlinkFile(extractPathFromUrl(existingVideo?.thumbnail));
+    if (extractPathFromUrl(existingVideo?.thumbnail)) {
+      unlinkFile(extractPathFromUrl(existingVideo?.thumbnail));
+    }
   }
   const result = await Video.findByIdAndUpdate(id, payload, {
     new: true,
@@ -29,10 +33,14 @@ const deleteVideo = async (id: string) => {
   const existingVideo = await Video.findById(id);
 
   if (existingVideo?.url) {
-    unlinkFile(extractPathFromUrl(existingVideo?.url));
+    if (extractPathFromUrl(existingVideo?.url)) {
+      unlinkFile(extractPathFromUrl(existingVideo?.url));
+    }
   }
   if (existingVideo?.thumbnail) {
-    unlinkFile(extractPathFromUrl(existingVideo?.thumbnail));
+    if (extractPathFromUrl(existingVideo?.thumbnail)) {
+      unlinkFile(extractPathFromUrl(existingVideo?.thumbnail));
+    }
   }
   const result = await Video.findByIdAndDelete(id);
   return result;
