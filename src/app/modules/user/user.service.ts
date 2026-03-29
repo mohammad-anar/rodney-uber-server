@@ -57,7 +57,9 @@ const updateUser = async (id: string, payload: Partial<IUser>) => {
   const existingUser = await User.findById(id);
 
   if (existingUser?.profilePhoto && payload.profilePhoto) {
-    unlinkFile(extractPathFromUrl(existingUser?.profilePhoto));
+    if (extractPathFromUrl(existingUser?.profilePhoto)) {
+      unlinkFile(extractPathFromUrl(existingUser?.profilePhoto));
+    }
   }
 
   const result = await User.findByIdAndUpdate(id, payload, {
