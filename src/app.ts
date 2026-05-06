@@ -1,104 +1,52 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
-import cors, { CorsOptions } from 'cors';
-import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-
-import router from './routes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import router from './routes';
 import { Morgan } from './shared/morgen';
 import sendResponse from './shared/sendResponse';
+import cookieParser from 'cookie-parser';
 
-const app: Application = express();
+const app = express();
 
-/**
- * ============================
- * Logger (Morgan)
- * ============================
- */
+//morgan
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
 
-/**
- * ============================
- * Allowed Origins
- * ============================
- */
-const allowedOrigins: string[] = [
+const allowedOrigins = [
   'http://localhost:3000',
   'https://dashboard.zeroproofdrive.org',
 ];
 
-/**
- * ============================
- * CORS Options (Type Safe)
- * ============================
- */
-const corsOptions: CorsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, curl, postman)
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    const isAllowed =
-      allowedOrigins.includes(origin) ||
-      (typeof origin === 'string' && origin.endsWith('.vercel.app'));
-
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(null, false); // DO NOT throw error
-    }
-  },
-
-  credentials: true,
-
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-/**
- * ============================
- * CORS Middleware
- * ============================
- */
-app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
-
-/**
- * ============================
- * Body & Cookie Parser
- * ============================
- */
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app')
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-/**
- * ============================
- * Static Files
- * ============================
- */
+//file retrieve
 app.use(express.static('uploads'));
 
-/**
- * ============================
- * Routes
- * ============================
- */
+//router
 app.use('/api/v1', router);
 
-/**
- * ============================
- * Health Check Route
- * ============================
- */
+//live response
 app.get('/', (req: Request, res: Response) => {
-  const date = new Date();
-
+  const date = new Date(Date.now());
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -107,19 +55,11 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-/**
- * ============================
- * Global Error Handler
- * ============================
- */
+//global error handle
 app.use(globalErrorHandler);
 
-/**
- * ============================
- * 404 Not Found Handler
- * ============================
- */
-app.use((req: Request, res: Response, next: NextFunction) => {
+//handle not found route;
+app.use((req, res) => {
   res.status(StatusCodes.NOT_FOUND).json({
     success: false,
     message: 'Not found',
