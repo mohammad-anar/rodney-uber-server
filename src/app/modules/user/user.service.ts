@@ -1,3 +1,5 @@
+import { StatusCodes } from 'http-status-codes';
+import ApiError from '../../../errors/ApiError';
 import { UserStatus } from '../../../enums/user';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
@@ -10,6 +12,25 @@ import { User } from './user.model';
 
 // create users
 const createUser = async (payload: IUser) => {
+  // Check if email already exists
+  const isExistEmail = await User.findOne({
+    email: payload.email.toLowerCase(),
+  });
+  if (isExistEmail) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists!');
+  }
+
+  // Check if deviceId already registered
+  if (payload.deviceId) {
+    const isExistDevice = await User.findOne({ deviceId: payload.deviceId });
+    if (isExistDevice) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'An account has already been registered on this device!',
+      );
+    }
+  }
+
   const result = await User.create(payload);
 
   //send email

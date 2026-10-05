@@ -21,6 +21,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    deviceId: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
+    },
+
     phone: {
       type: String,
       unique: true,
@@ -83,10 +90,21 @@ userSchema.statics.isExistUserById = async (id: string) => {
 
 //check user
 userSchema.pre('save', async function () {
-  //check user
-  const isExist = await User.findOne({ email: this.email });
-  if (isExist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+  //check user email
+  const isExistEmail = await User.findOne({ email: this.email });
+  if (isExistEmail) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists!');
+  }
+
+  //check deviceId uniqueness
+  if (this.deviceId) {
+    const isExistDevice = await User.findOne({ deviceId: this.deviceId });
+    if (isExistDevice) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'An account has already been registered on this device!',
+      );
+    }
   }
 
   //password hash

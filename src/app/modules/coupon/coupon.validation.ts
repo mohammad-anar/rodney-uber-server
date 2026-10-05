@@ -79,3 +79,9 @@ export const updateCouponSchema = z
       });
     }
   });
+
+export const claimCouponSchema = z.object({
+  body: z.object({
+    videoId: z.string({ message: 'Video ID is required' }),
+  }),
+});

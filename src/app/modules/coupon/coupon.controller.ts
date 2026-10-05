@@ -39,18 +39,57 @@ const getCouponById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-const getRandomCoupon = catchAsync(async (req: Request, res: Response) => {
-  const { email, videoId } = req.body;
+const getClaimStatus = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.id;
 
-  const result = await CouponServices.getRandomCoupon(email, videoId);
+  const result = await CouponServices.getClaimStatus(userId);
 
   sendResponse(res, {
     success: true,
-    message: 'Coupon retrieve successfully',
+    message: 'Claim status retrieved successfully',
     statusCode: 200,
     data: result,
   });
 });
+
+const claimCoupon = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.id;
+  const { videoId } = req.body;
+
+  const result = await CouponServices.claimCoupon(userId, videoId);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Promo code claimed successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+
+const getRandomCoupon = catchAsync(async (req: Request, res: Response) => {
+  // If user is authenticated, claim via user session
+  if (req.user?.id) {
+    const { videoId } = req.body;
+    const result = await CouponServices.claimCoupon(req.user.id, videoId);
+    return sendResponse(res, {
+      success: true,
+      message: 'Promo code claimed successfully',
+      statusCode: 200,
+      data: result,
+    });
+  }
+
+  const { email, videoId } = req.body;
+  const result = await CouponServices.getRandomCoupon(email, videoId);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Coupon retrieved successfully',
+    statusCode: 200,
+    data: result,
+  });
+});
+
 const updateCoupon = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const payload = req.body;
@@ -64,6 +103,7 @@ const updateCoupon = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteCoupon = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -81,6 +121,8 @@ export const CouponController = {
   createCoupon,
   getAllCoupons,
   getCouponById,
+  getClaimStatus,
+  claimCoupon,
   updateCoupon,
   deleteCoupon,
   getRandomCoupon,
