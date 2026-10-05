@@ -97,8 +97,11 @@ userSchema.pre('save', async function () {
   }
 
   //check deviceId uniqueness
-  if (this.deviceId) {
-    const isExistDevice = await User.findOne({ deviceId: this.deviceId });
+  if (this.deviceId && this.role === USER_ROLES.USER) {
+    const isExistDevice = await User.findOne({
+      deviceId: this.deviceId,
+      role: USER_ROLES.USER,
+    });
     if (isExistDevice) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,

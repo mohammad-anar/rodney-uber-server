@@ -7,6 +7,7 @@ const payload = {
   name: config.super_admin.name,
   phone: config.super_admin.phone,
   email: config.super_admin.email,
+  deviceId: 'SUPER_ADMIN_SYSTEM_DEVICE',
   role: USER_ROLES.ADMIN,
   password: config.super_admin.password,
   emailVerified: true,

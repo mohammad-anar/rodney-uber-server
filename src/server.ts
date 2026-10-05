@@ -22,13 +22,17 @@ process.on('uncaughtException', error => {
 let server: any;
 async function main() {
   try {
-    mongoose.connect(config.database_url as string);
+    await mongoose.connect(config.database_url as string);
     logger.info(colors.green('🚀 Database connected successfully'));
 
     //Seed Super Admin after database connection is successful
     await seedSuperAdmin();
 
-    await User.collection.dropIndex('phone_1');
+    try {
+      await User.collection.dropIndex('phone_1');
+    } catch (indexError) {
+      // Index not found or already dropped, ignore
+    }
 
     const port =
       typeof config.port === 'number' ? config.port : Number(config.port);
@@ -41,17 +45,16 @@ async function main() {
       );
     });
 
-    const LIVE_URL =
-      process.env.RENDER_URL || 'https://rodney-uber-server-crj2.onrender.com';
-
-    cron.schedule('*/5 * * * *', async () => {
-      try {
-        const res = await axios.get(`${LIVE_URL}/`);
-        console.log('Cron ping:', res.data);
-      } catch (err) {
-        console.error('Cron error:', err);
-      }
-    });
+    if (process.env.RENDER_URL) {
+      cron.schedule('*/5 * * * *', async () => {
+        try {
+          const res = await axios.get(`${process.env.RENDER_URL}/`);
+          console.log('Cron ping:', res.data);
+        } catch (err: any) {
+          console.error('Cron error:', err?.message || err);
+        }
+      });
+    }
 
     //socket
     const io = new Server(server, {
