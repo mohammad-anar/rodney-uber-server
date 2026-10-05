@@ -8,7 +8,7 @@ WORKDIR /app
 RUN npm install -g pnpm
  
 # Copy configuration and lockfiles first for better caching
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
 COPY tsconfig.json ./
  
 # Install all dependencies (including devDeps for building)
@@ -38,6 +38,7 @@ RUN adduser --system --uid 1001 expressjs
 # Copy only necessary files from builder
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/pnpm-workspace.yaml* ./
 COPY --from=builder /app/dist ./dist
  
 # Install only production dependencies
