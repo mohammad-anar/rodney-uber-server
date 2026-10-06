@@ -19,10 +19,23 @@ router.post(
   validateRequest(AuthValidation.createVerifyEmailZodSchema),
   AuthController.verifyEmail,
 );
+
+router.post(
+  '/verify-account',
+  validateRequest(AuthValidation.verifyAccountZodSchema),
+  AuthController.verifyAccount,
+);
+
 router.post(
   '/resend-otp',
   validateRequest(AuthValidation.resendVerifyEmailZodSchema),
   AuthController.resendVerifyEmail,
+);
+
+router.post(
+  '/send-verification-otp',
+  validateRequest(AuthValidation.sendVerificationOtpZodSchema),
+  AuthController.sendVerificationOtp,
 );
 
 router.post(
@@ -39,3 +52,4 @@ router.post(
 );
 
 export const AuthRoutes = router;
+

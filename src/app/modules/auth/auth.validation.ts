@@ -1,27 +1,61 @@
 import { z } from 'zod';
 
+const otpSchema = z.union([
+  z.number({ message: 'OTP is required' }),
+  z
+    .string({ message: 'OTP is required' })
+    .regex(/^\d+$/, 'OTP must be a numeric code')
+    .transform(val => Number(val)),
+]);
+
 const createVerifyEmailZodSchema = z.object({
   body: z.object({
-    email: z.string({ message: 'Email is required' }),
-    otp: z.number({ message: 'One time code is required' }),
+    email: z
+      .string({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' }),
+    otp: otpSchema,
   }),
 });
+
 const resendVerifyEmailZodSchema = z.object({
   body: z.object({
-    email: z.string({ message: 'Email is required' }),
+    email: z
+      .string({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' }),
+  }),
+});
+
+const sendVerificationOtpZodSchema = z.object({
+  body: z.object({
+    email: z
+      .string({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' }),
+  }),
+});
+
+const verifyAccountZodSchema = z.object({
+  body: z.object({
+    email: z
+      .string({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' }),
+    otp: otpSchema,
   }),
 });
 
 const createLoginZodSchema = z.object({
   body: z.object({
-    email: z.string({ message: 'Email is required' }),
+    email: z
+      .string({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' }),
     password: z.string({ message: 'Password is required' }),
   }),
 });
 
 const createForgetPasswordZodSchema = z.object({
   body: z.object({
-    email: z.string({ message: 'Email is required' }),
+    email: z
+      .string({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' }),
   }),
 });
 
@@ -49,8 +83,11 @@ const createChangePasswordZodSchema = z.object({
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   resendVerifyEmailZodSchema,
+  sendVerificationOtpZodSchema,
+  verifyAccountZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,
   createChangePasswordZodSchema,
 };
+

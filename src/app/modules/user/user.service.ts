@@ -33,17 +33,8 @@ const createUser = async (payload: IUser) => {
 
   const result = await User.create(payload);
 
-  //send email
+  // Generate OTP and save authentication to DB
   const otp = generateOTP();
-  const values = {
-    name: result.name,
-    otp: otp,
-    email: result.email!,
-  };
-  const createAccountTemplate = await emailTemplate.createAccount(values);
-  await emailHelper.sendEmail(createAccountTemplate);
-
-  //save to DB
   const authentication = {
     oneTimeCode: otp,
     expireAt: new Date(Date.now() + 3 * 60000),
@@ -52,6 +43,20 @@ const createUser = async (payload: IUser) => {
     { _id: result._id },
     { $set: { authentication } },
   );
+
+  // Send verification email
+  try {
+    const values = {
+      name: result.name,
+      otp: otp,
+      email: result.email!,
+    };
+    const createAccountTemplate = emailTemplate.createAccount(values);
+    await emailHelper.sendEmail(createAccountTemplate);
+  } catch (error) {
+    // Account is created; OTP is saved in DB, so user can also use resend-otp
+  }
+
   return result;
 };
 // get all users

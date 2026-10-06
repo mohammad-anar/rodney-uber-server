@@ -304,9 +304,104 @@ const changePasswordToDB = async (
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
 };
 
+// send verification otp to unverified / pending account
+const sendVerificationOtp = async (email: string) => {
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (!existingUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "User doesn't exist!");
+  }
+
+  if (existingUser.emailVerified) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Your account is already verified. Please login.',
+    );
+  }
+
+  if (existingUser.status === UserStatus.DELETED) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'This account has been deactivated.',
+    );
+  }
+
+  // generate OTP
+  const otp = generateOTP();
+  const authentication = {
+    oneTimeCode: otp,
+    expireAt: new Date(Date.now() + 3 * 60000),
+  };
+  await User.findOneAndUpdate(
+    { _id: existingUser._id },
+    { $set: { authentication } },
+  );
+
+  // send email
+  const values = {
+    name: existingUser.name,
+    otp: otp,
+    email: existingUser.email!,
+  };
+  const createAccountTemplate = emailTemplate.createAccount(values);
+  await emailHelper.sendEmail(createAccountTemplate);
+
+  return { email: existingUser.email };
+};
+
+// verify pending account with OTP
+const verifyAccount = async (payload: IVerifyEmail) => {
+  const { email, oneTimeCode } = payload;
+  const isExistUser = await User.findOne({
+    email: email.toLowerCase(),
+  }).select('+authentication');
+
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "User doesn't exist!");
+  }
+
+  if (isExistUser.emailVerified) {
+    return {
+      message: 'Account is already verified. Please login.',
+    };
+  }
+
+  if (!oneTimeCode) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Please provide the OTP sent to your email',
+    );
+  }
+
+  if (Number(isExistUser.authentication?.oneTimeCode) !== Number(oneTimeCode)) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid OTP provided');
+  }
+
+  const date = new Date();
+  if (date > (isExistUser?.authentication?.expireAt as any)) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'OTP has expired. Please request a new verification code.',
+    );
+  }
+
+  await User.findOneAndUpdate(
+    { _id: isExistUser._id },
+    {
+      emailVerified: true,
+      authentication: { oneTimeCode: null, expireAt: null },
+    },
+  );
+
+  return {
+    message: 'Account verified successfully. You can now login.',
+  };
+};
+
 export const AuthService = {
   verifyEmail,
   resendVerifyEmail,
+  sendVerificationOtp,
+  verifyAccount,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,

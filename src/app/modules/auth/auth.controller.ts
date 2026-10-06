@@ -85,9 +85,34 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const sendVerificationOtp = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const result = await AuthService.sendVerificationOtp(email);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Verification OTP sent to your email successfully.',
+    data: result,
+  });
+});
+
+const verifyAccount = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const result = await AuthService.verifyAccount({ email, oneTimeCode: otp });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: result.message,
+  });
+});
+
 export const AuthController = {
   verifyEmail,
   resendVerifyEmail,
+  sendVerificationOtp,
+  verifyAccount,
   loginUser,
   forgetPassword,
   resetPassword,
