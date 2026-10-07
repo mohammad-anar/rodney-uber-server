@@ -26,7 +26,13 @@ const sendEmail = async (values: ISendEmail) => {
       from: `"Zero Proof Driving" <${config.email.from || config.email.user}>`,
       to: values.to,
       subject: values.subject,
+      text: values.text,
       html: values.html,
+      headers: {
+        'X-Priority': '1 (Highest)',
+        'X-MSMail-Priority': 'High',
+        Importance: 'High',
+      },
     });
 
     logger.info('Mail sent successfully to: %o', info.accepted);
