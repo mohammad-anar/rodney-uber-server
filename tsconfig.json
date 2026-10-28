@@ -1,6 +1,6 @@
 {
   "include": ["src"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "dist", "src/**/__tests__/*", "**/*.test.ts"],
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",

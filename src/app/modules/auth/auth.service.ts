@@ -7,6 +7,7 @@ import ApiError from '../../../errors/ApiError';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { jwtHelper } from '../../../helpers/jwtHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { errorLogger } from '../../../shared/logger';
 import {
   IAuthResetPassword,
   IChangePassword,
@@ -97,7 +98,9 @@ const forgetPasswordToDB = async (email: string) => {
     email: isExistByEmail.email,
   };
   const forgetPassword = emailTemplate.resetPassword(value);
-  emailHelper.sendEmail(forgetPassword);
+  emailHelper.sendEmail(forgetPassword).catch(error => {
+    errorLogger.error('Forgot password email sending failed:', error);
+  });
 
   //save to DB
   const authentication = {

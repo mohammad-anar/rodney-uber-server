@@ -1,6 +1,7 @@
 import ApiError from '../../../errors/ApiError';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { errorLogger } from '../../../shared/logger';
 import { IQueryParams } from '../../../types/pagination';
 import generateOTP from '../../../util/generateOTP';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -28,7 +29,9 @@ const checkEmailUsage = async (email: string) => {
   };
 
   const checkEmail = emailTemplate.resetPassword(value);
-  emailHelper.sendEmail(checkEmail);
+  emailHelper.sendEmail(checkEmail).catch(error => {
+    errorLogger.error('Coupon verification email sending failed:', error);
+  });
 
   await CheckEmail.create({
     oneTimeCode: otp,

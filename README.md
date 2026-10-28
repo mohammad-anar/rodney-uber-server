@@ -1,73 +1,98 @@
-# Project Name
+# Rodney Uber Server
 
-This is a template project for backend development using Typescript, Node.js, Express, Mongoose, Bcrypt, JWT, NodeMailer, Multer, ESLint, and Prettier. The aim is to reduce setup time for new backend projects.
+Backend application built with TypeScript, Node.js, Express, Mongoose, Resend API, JWT, Multer, Winston, and Socket.io.
 
 ## Features
 
-- **Authentication API:** Complete authentication system using JWT for secure token-based authentication and bcrypt for password hashing.
-- **File Upload:** Implemented using Multer with efficient file handling and short-term storage.
-- **Data Validation:** Robust data validation using Zod and Mongoose schemas.
-- **Code Quality:** Ensured code readability and quality with ESLint and Prettier.
-- **Email Service:** Sending emails through NodeMailer.
-- **File Handling:** Efficient file deletion using `fs.unlink`.
-- **Environment Configuration:** Easy configuration using a `.env` file.
-- **Logging:** Logging with Winston and file rotation using DailyRotateFile.
-- **API Request Logging:** Logging API requests using Morgan.
+- **Authentication API:** Secure token-based authentication (JWT) with bcrypt password hashing.
+- **Email Service:** Transactional email sending via the official **Resend API SDK** (`resend`).
+- **File Upload:** Managed via Multer with validation and processing.
+- **Data Validation:** Robust schema and request validation using Zod and Mongoose.
+- **Code Quality & Testing:** Jest test suite with TypeScript integration (`ts-jest`), ESLint, and Prettier.
+- **Logging:** Structured logging with Winston and daily log rotation.
+- **Real-Time Communication:** WebSockets via Socket.io.
 
 ## Tech Stack
 
-- Typescript
+- TypeScript
 - Node.js
 - Express
-- Mongoose
-- Bcrypt
-- JWT
-- NodeMailer
-- Multer
-- ESLint
-- Prettier
-- Winston
-- Daily-winston-rotate-file
-- Morgen
-- Socket
+- Mongoose / MongoDB
+- Resend SDK (`resend`)
+- Bcrypt / JSONWebToken (JWT)
+- Winston / Morgan
+- Jest / ts-jest
+- Socket.io
+
+## Email Service Configuration (Resend)
+
+The application uses Resend API for transactional emails (account verification, password reset, coupon verification).
+
+### 1. Create a Resend API Key
+
+1. Log in to your [Resend Dashboard](https://resend.com).
+2. Go to [API Keys](https://resend.com/api-keys).
+3. Click **Create API Key**.
+4. Set permission to **Sending access** (or Full access) and select your verified domain (`zeroproofdrive.org`).
+5. Copy the generated API key.
+
+### 2. Configure Environment Variables
+
+Create or update your `.env` file in the project root:
+
+```env
+# Resend Email Configuration
+RESEND_API_KEY=re_your_actual_api_key
+MAIL_FROM="ZeroProofDrive <noreply@zeroproofdrive.org>"
+```
+
+> **Note:**
+> - `RESEND_API_KEY`: Server-side API key from Resend. Never commit this to Git or expose it to clients.
+> - `MAIL_FROM`: The sender address. Must use your verified Resend domain (e.g., `noreply@zeroproofdrive.org`).
+
+### 3. Verification & DNS Status
+
+- Verified domain: `zeroproofdrive.org`
+- No additional DNS changes are required if the domain is already verified in Resend.
+
+## Running Tests
+
+Run the automated test suite (uses mocked Resend API, so no real emails are sent):
+
+```bash
+pnpm test
+```
+
+## Performing a Real Email Integration Test
+
+To explicitly test sending a real transactional email with valid Resend credentials:
+
+```bash
+npx ts-node scripts/sendTestEmail.ts your_email@example.com
+```
 
 ## Getting Started
 
-Follow these steps to set up and run the project locally.
-
 ### Prerequisites
 
-Ensure you have the following installed:
-
-- Node.js
-- npm or yarn
+- Node.js (v18+ recommended)
+- pnpm
 
 ### Installation
 
-1. **Clone the repository:**
+```bash
+pnpm install
+```
 
-   ```bash
-   git clone https://github.com/yourusername/your-repository.git
-   cd your-repository
-   ```
+### Running Locally
 
-2. **Install dependencies:**
+```bash
+# Start development server
+pnpm run dev
 
-   Using npm:
+# Build project
+pnpm run build
 
-   ```bash
-   npm install
-   ```
-
-
-
-
-
-4. **Run the project:**
-
-   Using npm:
-
-   ```bash
-   npm run dev
-   ```
-
+# Start production server
+pnpm start
+```
